@@ -1,6 +1,6 @@
 ---
-name: Custom issue template
-about: Describe this issue template's purpose here.
+name: Create Task - Weapon Detection
+about: Template used to create a task item for Weapon Detection project.
 title: ''
 labels: ''
 assignees: ''
