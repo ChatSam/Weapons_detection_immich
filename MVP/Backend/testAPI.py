@@ -1,10 +1,11 @@
 import requests
-import argparse
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
 
 URL = None
 
 def authenticate(api_endpoint, username, password):
-    
     access_url = URL + api_endpoint
     access_token = None
 
@@ -23,18 +24,14 @@ def authenticate(api_endpoint, username, password):
     # Process the response
     if response.status_code == 201:
         print('Authentication successful')
-
         access_token = response.json()['accessToken']
-
     else:
         print('Authentication failed')
 
     return access_token
 
 def create_api_key(api_endpoint, name, access_token):
-
     access_url = URL + api_endpoint
-
     api_key = None
 
     headers = {
@@ -53,18 +50,14 @@ def create_api_key(api_endpoint, name, access_token):
     if response.status_code == 201:
         print('API key created successfully')
         api_key = response.json()['secret']
-    
     else:
         print('API key creation failed')
         exit(1)
 
     return api_key
 
-
 def getAsset(api_endpoint, api_key, asset_id):
-    
     access_url = URL + api_endpoint + '/' + asset_id
-    
     asset_data = None
 
     headers = {
@@ -72,9 +65,9 @@ def getAsset(api_endpoint, api_key, asset_id):
         'Accept': 'application/json',
         'x-api-key': api_key
     }
-    
+
     response = requests.get(access_url, headers=headers)
-    
+
     # Process the response
     if response.status_code == 200:
         print('Asset retrieved successfully')
@@ -86,38 +79,29 @@ def getAsset(api_endpoint, api_key, asset_id):
 
     return asset_data
 
-def main():
-
+@app.route('/getVideo', methods=['POST'])
+def get_video():
     global URL
 
-    parser = argparse.ArgumentParser(description='Weapons Detection API Test')
+    data = request.get_json()
 
-    parser.add_argument('url', help='API endpoint URL', type=str)
-    parser.add_argument('--api_key', help='API key', type=str)
-    parser.add_argument('--username', help='Username', type=str)
-    parser.add_argument('--password', help='Password', type=str)
-    parser.add_argument('--asset_id', help='Asset ID', type=str)
+    if 'url' not in data or 'username' not in data or 'password' not in data or 'asset_id' not in data:
+        return jsonify({'error': 'Missing required parameters'}), 400
 
-    args = parser.parse_args()
+    URL = data['url']
+    username = data['username']
+    password = data['password']
+    asset_id = data['asset_id']
 
-    if not args.api_key and (not args.username or not args.password):
-        print('Please provide either an API key or both username and password.')
-        return
+    access_token = authenticate('/api/auth/login', username, password)
+    if access_token:
+        api_key = create_api_key('/api/api-key', 'test_key', access_token)
+        if api_key:
+            asset_data = getAsset('/api/asset', api_key, asset_id)
+            if asset_data:
+                return jsonify(asset_data), 200
 
-    URL = args.url
-    api_key = args.api_key
-
-    if not api_key:
-        # Call the authenticate function with the provided arguments
-        access_token = authenticate('/api/auth/login', args.username, args.password)
-        if access_token:
-            # Call the create_api_key function
-            api_key = create_api_key('/api/api-key', 'test_key', access_token)
-
-    if api_key and args.asset_id:
-        # Call the getAsset function
-        getAsset('/api/asset', api_key, args.asset_id)
-
+    return jsonify({'error': 'Failed to retrieve asset'}), 500
 
 if __name__ == '__main__':
-    main()
+    app.run()
