@@ -84,6 +84,9 @@
   let isShowActivity = false;
   let isLiked: ActivityResponseDto | null = null;
   let numberOfComments: number;
+  let isShowWeaponsDetect = false;
+  let shouldShowWeaponsDetectionButton = asset.type === AssetTypeEnum.Video
+
 
   $: {
     if (asset.stackCount && asset.stack) {
@@ -561,6 +564,11 @@
       await handleError(error, `Unable to unstack`);
     }
   };
+
+  const detectWeapons = () => {
+    isShowWeaponsDetect = true;
+  };
+
 </script>
 
 <section
@@ -576,6 +584,7 @@
         showCopyButton={canCopyImagesToClipboard && asset.type === AssetTypeEnum.Image}
         showZoomButton={asset.type === AssetTypeEnum.Image}
         showMotionPlayButton={!!asset.livePhotoVideoId}
+        showWeaponsDetectionButton={shouldShowWeaponsDetectionButton}
         showDownloadButton={shouldShowDownloadButton}
         showDetailButton={shouldShowDetailButton}
         showSlideshow={!!assetStore}
@@ -594,6 +603,7 @@
         on:runJob={({ detail: job }) => handleRunJob(job)}
         on:playSlideShow={() => ($slideshowState = SlideshowState.PlaySlideshow)}
         on:unstack={handleUnstack}
+        on:searchWeapons={() => detectWeapons(asset)}
       />
     </div>
   {/if}
