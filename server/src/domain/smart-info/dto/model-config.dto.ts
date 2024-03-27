@@ -58,5 +58,5 @@ export class WeaponsDetectConfig extends ModelConfig {
   @IsEnum(MediaMode)
   @Optional()
   @ApiProperty({ enumName: 'MediaMode', enum: MediaMode })
-  mode!: MediaMode;
+  mode?: MediaMode;
 }

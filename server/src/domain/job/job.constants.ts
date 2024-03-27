@@ -4,6 +4,7 @@ export enum QueueName {
   VIDEO_CONVERSION = 'videoConversion',
   FACE_DETECTION = 'faceDetection',
   FACIAL_RECOGNITION = 'facialRecognition',
+  WEAPONS_DETECTION = 'weaponsDetection',
   SMART_SEARCH = 'smartSearch',
   BACKGROUND_TASK = 'backgroundTask',
   STORAGE_TEMPLATE_MIGRATION = 'storageTemplateMigration',
@@ -67,6 +68,9 @@ export enum JobName {
   FACE_DETECTION = 'face-detection',
   QUEUE_FACIAL_RECOGNITION = 'queue-facial-recognition',
   FACIAL_RECOGNITION = 'facial-recognition',
+
+  // weapons detection
+  WEAPONS_DETECTION = 'weapons-detection',
 
   // library managment
   LIBRARY_SCAN = 'library-refresh',
@@ -134,6 +138,9 @@ export const JOBS_TO_QUEUE: Record<JobName, QueueName> = {
   [JobName.FACE_DETECTION]: QueueName.FACE_DETECTION,
   [JobName.QUEUE_FACIAL_RECOGNITION]: QueueName.FACIAL_RECOGNITION,
   [JobName.FACIAL_RECOGNITION]: QueueName.FACIAL_RECOGNITION,
+
+  // weapons detection
+  [JobName.WEAPONS_DETECTION]: QueueName.WEAPONS_DETECTION,
 
   // smart search
   [JobName.QUEUE_SMART_SEARCH]: QueueName.SMART_SEARCH,

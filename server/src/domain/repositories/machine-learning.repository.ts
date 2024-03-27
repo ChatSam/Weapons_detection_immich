@@ -1,4 +1,4 @@
-import { CLIPConfig, RecognitionConfig, WeaponDetectConfig } from '../smart-info/dto';
+import { CLIPConfig, RecognitionConfig, WeaponsDetectConfig } from '../smart-info/dto';
 
 export const IMachineLearningRepository = 'IMachineLearningRepository';
 
@@ -51,5 +51,5 @@ export interface IMachineLearningRepository {
   encodeImage(url: string, input: VisionModelInput, config: CLIPConfig): Promise<number[]>;
   encodeText(url: string, input: TextModelInput, config: CLIPConfig): Promise<number[]>;
   detectFaces(url: string, input: VisionModelInput, config: RecognitionConfig): Promise<DetectFaceResult[]>;
-  detectWeapons(url: string, input: VisionModelInput, config: WeaponDetectConfig): Promise<DetectWeaponsResult[]>;
+  detectWeapons(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult[]>;
 }
