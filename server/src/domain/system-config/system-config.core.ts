@@ -59,7 +59,6 @@ export const defaults = Object.freeze<SystemConfig>({
     [QueueName.MIGRATION]: { concurrency: 5 },
     [QueueName.THUMBNAIL_GENERATION]: { concurrency: 5 },
     [QueueName.VIDEO_CONVERSION]: { concurrency: 1 },
-    [QueueName.WEAPONS_DETECTION]: { concurrency: 1 },
   },
   logging: {
     enabled: true,
@@ -80,8 +79,8 @@ export const defaults = Object.freeze<SystemConfig>({
       minFaces: 3,
     },
     weaponsDetection: {
-      enabled: false,
-      modelName: 'yolov5s',
+      enabled: true,
+      modelName: 'yoloV8-weapons-detection',
       minScore: 0.5,
     }
   },

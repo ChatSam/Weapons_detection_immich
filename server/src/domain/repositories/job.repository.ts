@@ -71,9 +71,6 @@ export type JobItem =
   | { name: JobName.FACIAL_RECOGNITION; data: IDeferrableJob }
   | { name: JobName.GENERATE_PERSON_THUMBNAIL; data: IEntityJob }
 
-  // Weapons Detection
-  | { name: JobName.WEAPONS_DETECTION; data: IEntityJob }
-
   // Smart Search
   | { name: JobName.QUEUE_SMART_SEARCH; data: IBaseJob }
   | { name: JobName.SMART_SEARCH; data: IEntityJob }

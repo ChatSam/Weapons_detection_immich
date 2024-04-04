@@ -70,10 +70,4 @@ export class SystemConfigJobDto implements Record<ConcurrentQueueName, JobSettin
   @IsObject()
   @Type(() => JobSettingsDto)
   [QueueName.LIBRARY]!: JobSettingsDto;
-
-  @ApiProperty({ type: JobSettingsDto })
-  @ValidateNested()
-  @IsObject()
-  @Type(() => JobSettingsDto)
-  [QueueName.WEAPONS_DETECTION]!: JobSettingsDto;
 }
