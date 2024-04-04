@@ -19,3 +19,4 @@ export * from './system-config.controller';
 export * from './tag.controller';
 export * from './trash.controller';
 export * from './user.controller';
+export * from './weapons-detect.controller';
