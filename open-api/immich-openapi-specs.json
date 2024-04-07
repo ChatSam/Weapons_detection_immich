@@ -6144,6 +6144,48 @@
           "User"
         ]
       }
+    },
+    "/weapons-detect/{id}": {
+      "get": {
+        "operationId": "getWeaponsDetect",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeaponsDetectResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "WeaponsDetect"
+        ]
+      }
     }
   },
   "info": {
@@ -8002,6 +8044,13 @@
         ],
         "type": "string"
       },
+      "MediaMode": {
+        "enum": [
+          "video",
+          "image"
+        ],
+        "type": "string"
+      },
       "MemoryLaneResponseDto": {
         "properties": {
           "assets": {
@@ -8038,7 +8087,8 @@
       "ModelType": {
         "enum": [
           "facial-recognition",
-          "clip"
+          "clip",
+          "weapons-detection"
         ],
         "type": "string"
       },
@@ -8616,6 +8666,9 @@
           },
           "trash": {
             "type": "boolean"
+          },
+          "weaponsDetection": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -8629,7 +8682,8 @@
           "search",
           "sidecar",
           "smartSearch",
-          "trash"
+          "trash",
+          "weaponsDetection"
         ],
         "type": "object"
       },
@@ -9259,13 +9313,17 @@
           },
           "url": {
             "type": "string"
+          },
+          "weaponsDetection": {
+            "$ref": "#/components/schemas/WeaponsDetectConfig"
           }
         },
         "required": [
           "clip",
           "enabled",
           "facialRecognition",
-          "url"
+          "url",
+          "weaponsDetection"
         ],
         "type": "object"
       },
@@ -9929,6 +9987,67 @@
           "vp9"
         ],
         "type": "string"
+      },
+      "WeaponsDetectConfig": {
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "minScore": {
+            "format": "float",
+            "type": "number"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/MediaMode"
+          },
+          "modelName": {
+            "type": "string"
+          },
+          "modelType": {
+            "$ref": "#/components/schemas/ModelType"
+          }
+        },
+        "required": [
+          "enabled",
+          "minScore",
+          "modelName"
+        ],
+        "type": "object"
+      },
+      "WeaponsDetectItem": {
+        "properties": {
+          "image": {
+            "description": "base-64 encoded image",
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "image",
+          "score"
+        ],
+        "type": "object"
+      },
+      "WeaponsDetectResponseDto": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/WeaponsDetectItem"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "id"
+        ],
+        "type": "object"
       }
     }
   }

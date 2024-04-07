@@ -2301,6 +2301,20 @@ export type MapTheme = typeof MapTheme[keyof typeof MapTheme];
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const MediaMode = {
+    Video: 'video',
+    Image: 'image'
+} as const;
+
+export type MediaMode = typeof MediaMode[keyof typeof MediaMode];
+
+
+/**
+ * 
+ * @export
  * @interface MemoryLaneResponseDto
  */
 export interface MemoryLaneResponseDto {
@@ -2338,7 +2352,8 @@ export interface MergePersonDto {
 
 export const ModelType = {
     FacialRecognition: 'facial-recognition',
-    Clip: 'clip'
+    Clip: 'clip',
+    WeaponsDetection: 'weapons-detection'
 } as const;
 
 export type ModelType = typeof ModelType[keyof typeof ModelType];
@@ -3104,6 +3119,12 @@ export interface ServerFeaturesDto {
      * @memberof ServerFeaturesDto
      */
     'trash': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ServerFeaturesDto
+     */
+    'weaponsDetection': boolean;
 }
 /**
  * 
@@ -3931,6 +3952,12 @@ export interface SystemConfigMachineLearningDto {
      * @memberof SystemConfigMachineLearningDto
      */
     'url': string;
+    /**
+     * 
+     * @type {WeaponsDetectConfig}
+     * @memberof SystemConfigMachineLearningDto
+     */
+    'weaponsDetection': WeaponsDetectConfig;
 }
 /**
  * 
@@ -4846,6 +4873,83 @@ export const VideoCodec = {
 export type VideoCodec = typeof VideoCodec[keyof typeof VideoCodec];
 
 
+/**
+ * 
+ * @export
+ * @interface WeaponsDetectConfig
+ */
+export interface WeaponsDetectConfig {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof WeaponsDetectConfig
+     */
+    'enabled': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof WeaponsDetectConfig
+     */
+    'minScore': number;
+    /**
+     * 
+     * @type {MediaMode}
+     * @memberof WeaponsDetectConfig
+     */
+    'mode'?: MediaMode;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeaponsDetectConfig
+     */
+    'modelName': string;
+    /**
+     * 
+     * @type {ModelType}
+     * @memberof WeaponsDetectConfig
+     */
+    'modelType'?: ModelType;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface WeaponsDetectItem
+ */
+export interface WeaponsDetectItem {
+    /**
+     * base-64 encoded image
+     * @type {string}
+     * @memberof WeaponsDetectItem
+     */
+    'image': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WeaponsDetectItem
+     */
+    'score': number;
+}
+/**
+ * 
+ * @export
+ * @interface WeaponsDetectResponseDto
+ */
+export interface WeaponsDetectResponseDto {
+    /**
+     * 
+     * @type {Array<WeaponsDetectItem>}
+     * @memberof WeaponsDetectResponseDto
+     */
+    'data': Array<WeaponsDetectItem>;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeaponsDetectResponseDto
+     */
+    'id': string;
+}
 
 /**
  * APIKeyApi - axios parameter creator
@@ -18595,6 +18699,133 @@ export class UserApi extends BaseAPI {
      */
     public updateUser(requestParameters: UserApiUpdateUserRequest, options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).updateUser(requestParameters.updateUserDto, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * WeaponsDetectApi - axios parameter creator
+ * @export
+ */
+export const WeaponsDetectApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWeaponsDetect: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getWeaponsDetect', 'id', id)
+            const localVarPath = `/weapons-detect/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication cookie required
+
+            // authentication api_key required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * WeaponsDetectApi - functional programming interface
+ * @export
+ */
+export const WeaponsDetectApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = WeaponsDetectApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getWeaponsDetect(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WeaponsDetectResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getWeaponsDetect(id, options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['WeaponsDetectApi.getWeaponsDetect']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * WeaponsDetectApi - factory interface
+ * @export
+ */
+export const WeaponsDetectApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = WeaponsDetectApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {WeaponsDetectApiGetWeaponsDetectRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWeaponsDetect(requestParameters: WeaponsDetectApiGetWeaponsDetectRequest, options?: RawAxiosRequestConfig): AxiosPromise<WeaponsDetectResponseDto> {
+            return localVarFp.getWeaponsDetect(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * Request parameters for getWeaponsDetect operation in WeaponsDetectApi.
+ * @export
+ * @interface WeaponsDetectApiGetWeaponsDetectRequest
+ */
+export interface WeaponsDetectApiGetWeaponsDetectRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof WeaponsDetectApiGetWeaponsDetect
+     */
+    readonly id: string
+}
+
+/**
+ * WeaponsDetectApi - object-oriented interface
+ * @export
+ * @class WeaponsDetectApi
+ * @extends {BaseAPI}
+ */
+export class WeaponsDetectApi extends BaseAPI {
+    /**
+     * 
+     * @param {WeaponsDetectApiGetWeaponsDetectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WeaponsDetectApi
+     */
+    public getWeaponsDetect(requestParameters: WeaponsDetectApiGetWeaponsDetectRequest, options?: RawAxiosRequestConfig) {
+        return WeaponsDetectApiFp(this.configuration).getWeaponsDetect(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
