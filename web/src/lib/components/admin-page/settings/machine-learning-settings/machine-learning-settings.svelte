@@ -145,8 +145,8 @@
       </SettingAccordion>
 
       <SettingAccordion
-        key="weapons-recognition"
-        title="Weapons Recognition"
+        key="weapons-detection"
+        title="Weapons Detection"
         subtitle="Detect pontential weapons in images"
       >
         <div class="ml-4 mt-4 flex flex-col gap-4">
@@ -162,8 +162,8 @@
           <SettingSelect
             label="WEAPONS DETECTION MODEL"
             desc="Current models available for weapons detection."
-            name="weapons-recognition-model"
-            bind:value={config.machineLearning.facialRecognition.modelName}
+            name="weapons-detection-model"
+            bind:value={config.machineLearning.weaponsDetection.modelName}
             options={[
               { value: 'yoloV8', text: 'yoloV8' },
             ]}
