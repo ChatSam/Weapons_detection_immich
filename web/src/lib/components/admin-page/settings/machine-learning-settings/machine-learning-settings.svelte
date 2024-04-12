@@ -144,6 +144,50 @@
         </div>
       </SettingAccordion>
 
+      <SettingAccordion
+        key="weapons-recognition"
+        title="Weapons Recognition"
+        subtitle="Detect pontential weapons in images"
+      >
+        <div class="ml-4 mt-4 flex flex-col gap-4">
+          <SettingSwitch
+            title="ENABLED"
+            subtitle="If disabled, images and videos will not have the option to be scanned for weapons."
+            bind:checked={config.machineLearning.weaponsDetection.enabled}
+            disabled={disabled || !config.machineLearning.enabled}
+          />
+
+          <hr />
+
+          <SettingSelect
+            label="WEAPONS DETECTION MODEL"
+            desc="Current models available for weapons detection."
+            name="weapons-recognition-model"
+            bind:value={config.machineLearning.facialRecognition.modelName}
+            options={[
+              { value: 'yoloV8', text: 'yoloV8' },
+            ]}
+            disabled={disabled || !config.machineLearning.enabled || !config.machineLearning.weaponsDetection.enabled}
+            isEdited={config.machineLearning.weaponsDetection.modelName !==
+              savedConfig.machineLearning.weaponsDetection.modelName}
+          />
+
+          <SettingInputField
+            inputType={SettingInputFieldType.NUMBER}
+            label="MIN DETECTION SCORE"
+            desc="Minimum confidence score for a weapon to be detected from 0-1. Lower values will detect more weapons but may result in false positives."
+            bind:value={config.machineLearning.weaponsDetection.minScore}
+            step="0.1"
+            min="0"
+            max="1"
+            disabled={disabled || !config.machineLearning.enabled || !config.machineLearning.weaponsDetection.enabled}
+            isEdited={config.machineLearning.weaponsDetection.minScore !==
+              savedConfig.machineLearning.weaponsDetection.minScore}
+          />
+
+        </div>
+      </SettingAccordion>
+
       <SettingButtonsRow
         on:reset={({ detail }) => dispatch('reset', { ...detail, configKeys: ['machineLearning'] })}
         on:save={() => dispatch('save', { machineLearning: config.machineLearning })}

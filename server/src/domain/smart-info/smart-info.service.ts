@@ -123,7 +123,7 @@ export class SmartInfoService {
       machineLearning.weaponsDetection,
     );
 
-    if (detectedWeapons.length < 1) {
+    if (detectedWeapons.length === 0) {
       throw new BadRequestException('No weapons response returned');
     }
 

@@ -80,7 +80,7 @@ export const defaults = Object.freeze<SystemConfig>({
     },
     weaponsDetection: {
       enabled: true,
-      modelName: 'yoloV8-weapons-detection',
+      modelName: 'yoloV8',
       minScore: 0.5,
     }
   },
