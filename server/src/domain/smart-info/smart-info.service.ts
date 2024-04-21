@@ -123,10 +123,6 @@ export class SmartInfoService {
       machineLearning.weaponsDetection,
     );
 
-    if (detectedWeapons.length === 0) {
-      throw new BadRequestException('No weapons response returned');
-    }
-
     const response = {
       id: id,
       data: detectedWeapons.map((weapon) => ({
