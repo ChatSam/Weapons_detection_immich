@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {type AssetResponseDto, type WeaponsDetectItem, api } from '@api';
+    import {type WeaponsDetectItem, api } from '@api';
     import { createEventDispatcher, onMount } from 'svelte';
     import BaseModal from './base-modal.svelte';
     import WeaponsListItem from '../asset-viewer/weapons-list-item.svelte';
@@ -7,7 +7,7 @@
   
     let weapons: WeaponsDetectItem[] = [];
     let loading = true;
-    export let assetId: AssetResponseDto;
+    export let assetId: string = '';
   
     const dispatch = createEventDispatcher<{
       close: void;
@@ -16,7 +16,7 @@
     onMount(async () => {
       
       try {
-        const { data } = await api.weaponsDetectApi.getWeaponsDetect({ id: assetId.id });
+        const { data } = await api.weaponsDetectApi.getWeaponsDetect({ id: assetId });
         weapons = data.data;
       } catch (error) {
       handleError(error, "Internal Server Error! Cannot Detect Weapons.");
