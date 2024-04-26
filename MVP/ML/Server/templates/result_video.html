@@ -1,0 +1,72 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Threat Detection Result</title>
+</head>
+<body>
+    <h1>Threat Detection Result</h1>
+    <p>Video ID: {{ video_id }}</p>
+    <video width="320" height="240" controls>
+        <source src="{{ video_url }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Detection Result</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #121212; /* Dark background */
+            color: #e0e0e0; /* Light grey text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container {
+            background: #1e1e1e; /* Slightly lighter than the body background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5); /* Stronger shadow for contrast */
+        }
+        h1 {
+            color: #90caf9; /* Light blue, for better visibility on dark backgrounds */
+            font-size: 24px;
+        }
+        p {
+            color: #b0bec5; /* Soft light grey, ensures readability */
+        }
+        video {
+            width: 100%; /* Responsive width */
+            max-width: 640px; /* Maximum size */
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4); /* Adjust shadow for dark theme */
+            outline: none; /* Keeps the modern look without outline */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Threat Detection Result</h1>
+        <p>Video ID: {{ video_id }}</p>
+        <video controls>
+            <source src="{{ video_url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</body>
+</html>
+
+
+
