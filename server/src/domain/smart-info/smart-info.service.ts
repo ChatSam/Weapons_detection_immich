@@ -12,11 +12,13 @@ import {
   ISmartInfoRepository,
   ISystemConfigRepository,
   WithoutProperty,
+  MediaMode,
 } from '../repositories';
 import { SystemConfigCore } from '../system-config';
 import { AccessCore, Permission } from '../access';
 import { AuthDto } from '../auth';
 import { WeaponsDetectResponseDto } from './dto/smart-info.dto';
+import { AssetType } from '@app/infra/entities';
 
 @Injectable()
 export class SmartInfoService {
@@ -120,7 +122,9 @@ export class SmartInfoService {
     const detectedWeapons = await this.machineLearning.detectWeapons(
       machineLearning.url,
       { imagePath: asset.resizePath },
-      machineLearning.weaponsDetection,
+      { ...machineLearning.weaponsDetection,
+        mode: asset.type === AssetType.VIDEO ? MediaMode.VIDEO : MediaMode.IMAGE
+      },
     );
 
     const response = {

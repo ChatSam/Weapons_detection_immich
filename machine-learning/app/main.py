@@ -23,7 +23,12 @@ from .schemas import (
     MessageResponse,
     ModelType,
     TextResponse,
+    DetectedWeapons,
 )
+
+import cv2
+import numpy as np
+import base64
 
 MultiPartParser.max_file_size = 2**26  # spools to disk if payload is 64 MiB or larger
 
@@ -104,7 +109,24 @@ async def predict(
         raise HTTPException(400, f"Invalid options JSON: {options}")
 
     if model_type == ModelType.WEAPONS_DETECTION:
-        raise HTTPException(501, "Weapons detection models are not yet supported")
+        image = inputs
+        if isinstance(image, bytes):
+            decoded_image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
+        else:
+            decoded_image = image
+
+        # Encode image to base64 string
+        _, buffer = cv2.imencode('.jpg', decoded_image)
+        encoded_string = base64.b64encode(buffer).decode('utf-8')
+
+        outputs = []
+        weapon: DetectedWeapons = {
+                "image": "data:image/jpeg;base64," + encoded_string,  # Prefix with data URI"
+                "score": 0.7
+            }
+        outputs.append(weapon)
+        return ORJSONResponse(outputs)
+    #     raise HTTPException(501, "Weapons detection models are not yet supported")
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
     outputs = await run(model.predict, inputs)

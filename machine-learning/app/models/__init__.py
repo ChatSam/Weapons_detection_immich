@@ -6,6 +6,7 @@ from .base import InferenceModel
 from .clip import MCLIPEncoder, OpenCLIPEncoder
 from .constants import is_insightface, is_mclip, is_openclip, is_weapons_detection
 from .facial_recognition import FaceRecognizer
+from .weapons_detector import WeaponsDetector
 
 
 def from_model_type(model_type: ModelType, model_name: str, **model_kwargs: Any) -> InferenceModel:
@@ -20,7 +21,7 @@ def from_model_type(model_type: ModelType, model_name: str, **model_kwargs: Any)
                 return FaceRecognizer(model_name, **model_kwargs)
         case ModelType.WEAPONS_DETECTION:
             if is_weapons_detection(model_name):
-                raise NotImplementedError("Weapons detection models are not yet supported")
+                return WeaponsDetector(model_name, **model_kwargs)
         case _:
             raise ValueError(f"Unknown model type {model_type}")
 
