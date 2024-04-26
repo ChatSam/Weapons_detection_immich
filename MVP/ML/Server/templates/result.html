@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Threat Detection Result</title>
@@ -8,4 +8,54 @@
     <p>Image ID: {{ image_id }}</p>
     <img src="{{ image_url }}" alt="Detected Threats" />
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Detection Result</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #121212; /* Dark background */
+            color: #e0e0e0; /* Light grey text for better visibility */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #1e1e1e; /* Slightly lighter dark shade for the container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Darker shadow for better contrast */
+            text-align: center;
+        }
+        h1 {
+            color: #90caf9; /* Soft blue, stands out nicely on dark backgrounds */
+            font-size: 24px;
+        }
+        p {
+            color: #b0bec5; /* Lighter gray for paragraphs to ensure readability */
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Slightly stronger shadow for depth */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Threat Detection Result (Image)</h1>
+        <p>Image ID: {{ image_id }}</p>
+        <img src="{{ image_url }}" alt="Detected Threats" style="border: solid 1px #333;"/> <!-- Optional border for better image definition -->
+    </div>
+</body>
 </html>
+
