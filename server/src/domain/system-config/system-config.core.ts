@@ -78,6 +78,11 @@ export const defaults = Object.freeze<SystemConfig>({
       maxDistance: 0.6,
       minFaces: 3,
     },
+    weaponsDetection: {
+      enabled: true,
+      modelName: 'yoloV8',
+      minScore: 0.5,
+    }
   },
   map: {
     enabled: true,
@@ -145,6 +150,7 @@ export const defaults = Object.freeze<SystemConfig>({
 export enum FeatureFlag {
   SMART_SEARCH = 'smartSearch',
   FACIAL_RECOGNITION = 'facialRecognition',
+  WEAPONS_DETECTION = 'weaponsDetection',
   MAP = 'map',
   REVERSE_GEOCODING = 'reverseGeocoding',
   SIDECAR = 'sidecar',
@@ -191,6 +197,9 @@ export class SystemConfigCore {
         case FeatureFlag.FACIAL_RECOGNITION: {
           throw new BadRequestException('Facial recognition is not enabled');
         }
+        case FeatureFlag.WEAPONS_DETECTION: {
+          throw new BadRequestException('Weapons detection is not enabled');
+        }
         case FeatureFlag.SIDECAR: {
           throw new BadRequestException('Sidecar is not enabled');
         }
@@ -225,6 +234,7 @@ export class SystemConfigCore {
     return {
       [FeatureFlag.SMART_SEARCH]: mlEnabled && config.machineLearning.clip.enabled,
       [FeatureFlag.FACIAL_RECOGNITION]: mlEnabled && config.machineLearning.facialRecognition.enabled,
+      [FeatureFlag.WEAPONS_DETECTION]: mlEnabled && config.machineLearning.weaponsDetection.enabled,
       [FeatureFlag.MAP]: config.map.enabled,
       [FeatureFlag.REVERSE_GEOCODING]: config.reverseGeocoding.enabled,
       [FeatureFlag.SIDECAR]: true,

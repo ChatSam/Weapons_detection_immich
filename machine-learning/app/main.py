@@ -103,6 +103,8 @@ async def predict(
     except orjson.JSONDecodeError:
         raise HTTPException(400, f"Invalid options JSON: {options}")
 
+    if model_type == ModelType.WEAPONS_DETECTION:
+        raise HTTPException(501, "Weapons detection models are not yet supported")
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
     outputs = await run(model.predict, inputs)

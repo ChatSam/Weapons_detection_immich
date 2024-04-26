@@ -1,4 +1,4 @@
-import { CLIPConfig, RecognitionConfig } from '@app/domain';
+import { CLIPConfig, RecognitionConfig, WeaponsDetectConfig } from '@app/domain';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsObject, IsUrl, ValidateIf, ValidateNested } from 'class-validator';
 
@@ -19,4 +19,9 @@ export class SystemConfigMachineLearningDto {
   @ValidateNested()
   @IsObject()
   facialRecognition!: RecognitionConfig;
+
+  @Type(() => WeaponsDetectConfig)
+  @ValidateNested()
+  @IsObject()
+  weaponsDetection!: WeaponsDetectConfig;
 }

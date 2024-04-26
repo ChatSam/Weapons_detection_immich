@@ -18,6 +18,7 @@
     mdiMagnifyPlusOutline,
     mdiMotionPauseOutline,
     mdiPlaySpeed,
+    mdiEyeCircleOutline,
   } from '@mdi/js';
   import { createEventDispatcher } from 'svelte';
   import ContextMenu from '../shared-components/context-menu/context-menu.svelte';
@@ -33,6 +34,7 @@
   export let showDetailButton: boolean;
   export let showSlideshow = false;
   export let hasStackChildren = false;
+  export let showWeaponsDetectionButton: boolean;
 
   $: isOwner = asset.ownerId === $user?.id;
 
@@ -53,6 +55,7 @@
     runJob: AssetJobName;
     playSlideShow: void;
     unstack: void;
+    searchWeapons: void;
   }>();
 
   let contextMenuPosition = { x: 0, y: 0 };
@@ -128,6 +131,15 @@
           window.dispatchEvent(copyEvent);
         }}
       />
+    {/if}
+
+    {#if showWeaponsDetectionButton}
+    <CircleIconButton
+      isOpacity={true}
+      icon={mdiEyeCircleOutline}
+      on:click={() => dispatch('searchWeapons')}
+      title="Detect Weapons"
+    />
     {/if}
 
     {#if showDownloadButton}

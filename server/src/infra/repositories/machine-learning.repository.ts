@@ -8,6 +8,9 @@ import {
   RecognitionConfig,
   TextModelInput,
   VisionModelInput,
+  WeaponsDetectConfig,
+  MediaMode,
+  DetectWeaponsResult,
 } from '@app/domain';
 import { Injectable } from '@nestjs/common';
 import { readFile } from 'node:fs/promises';
@@ -48,6 +51,10 @@ export class MachineLearningRepository implements IMachineLearningRepository {
       modelType: ModelType.CLIP,
       mode: CLIPMode.TEXT,
     } as CLIPConfig);
+  }
+
+  detectWeapons(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult[]> {
+    return this.predict<DetectWeaponsResult[]>(url, input, { ...config, modelType: ModelType.WEAPONS_DETECTION});
   }
 
   async getFormData(input: TextModelInput | VisionModelInput, config: ModelConfig): Promise<FormData> {

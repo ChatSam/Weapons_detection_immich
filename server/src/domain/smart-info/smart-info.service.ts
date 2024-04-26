@@ -1,8 +1,9 @@
 import { ImmichLogger } from '@app/infra/logger';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, BadRequestException } from '@nestjs/common';
 import { usePagination } from '../domain.util';
 import { IBaseJob, IEntityJob, JOBS_ASSET_PAGINATION_SIZE, JobName, QueueName } from '../job';
 import {
+  IAccessRepository,
   DatabaseLock,
   IAssetRepository,
   IDatabaseRepository,
@@ -13,13 +14,18 @@ import {
   WithoutProperty,
 } from '../repositories';
 import { SystemConfigCore } from '../system-config';
+import { AccessCore, Permission } from '../access';
+import { AuthDto } from '../auth';
+import { WeaponsDetectResponseDto } from './dto/smart-info.dto';
 
 @Injectable()
 export class SmartInfoService {
   private configCore: SystemConfigCore;
   private logger = new ImmichLogger(SmartInfoService.name);
+  private access: AccessCore;
 
   constructor(
+    @Inject(IAccessRepository) accessRepository: IAccessRepository,
     @Inject(IAssetRepository) private assetRepository: IAssetRepository,
     @Inject(IDatabaseRepository) private databaseRepository: IDatabaseRepository,
     @Inject(IJobRepository) private jobRepository: IJobRepository,
@@ -27,6 +33,7 @@ export class SmartInfoService {
     @Inject(ISmartInfoRepository) private repository: ISmartInfoRepository,
     @Inject(ISystemConfigRepository) configRepository: ISystemConfigRepository,
   ) {
+    this.access = AccessCore.create(accessRepository);
     this.configCore = SystemConfigCore.create(configRepository);
   }
 
@@ -91,4 +98,40 @@ export class SmartInfoService {
 
     return true;
   }
+
+  async handleDetectWeapons(auth: AuthDto, id: string): Promise<WeaponsDetectResponseDto> {
+    await this.access.requirePermission(auth, Permission.ASSET_READ, id);
+
+    const { machineLearning } = await this.configCore.getConfig();
+    if (!machineLearning.enabled || !machineLearning.weaponsDetection.enabled){
+      throw new BadRequestException('Machine learning is disabled');
+    }
+
+    const asset = await this.assetRepository.getById(id);
+
+    if (!asset) {
+      throw new BadRequestException('Asset not found');
+    }
+
+    if (!asset.resizePath) {
+      throw new BadRequestException('Asset has no image file path');
+    }
+
+    const detectedWeapons = await this.machineLearning.detectWeapons(
+      machineLearning.url,
+      { imagePath: asset.resizePath },
+      machineLearning.weaponsDetection,
+    );
+
+    const response = {
+      id: id,
+      data: detectedWeapons.map((weapon) => ({
+        image: weapon.image,
+        score: weapon.score,
+      })),
+    };
+
+    return response;
+  }
+
 }

@@ -13,6 +13,7 @@
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
   import AlbumSelectionModal from '../shared-components/album-selection-modal.svelte';
+  import WeaponsDetectionWindow from '../shared-components/weapons-detection-window.svelte';
   import { notificationController, NotificationType } from '../shared-components/notification/notification';
   import AssetViewerNavBar from './asset-viewer-nav-bar.svelte';
   import DetailPanel from './detail-panel.svelte';
@@ -71,6 +72,7 @@
 
   let appearsInAlbums: AlbumResponseDto[] = [];
   let isShowAlbumPicker = false;
+  let isShowWeaponsDetect = false;
   let isShowDeleteConfirmation = false;
   let addToSharedAlbum = true;
   let shouldPlayMotionPhoto = false;
@@ -84,6 +86,8 @@
   let isShowActivity = false;
   let isLiked: ActivityResponseDto | null = null;
   let numberOfComments: number;
+  let shouldShowWeaponsDetectionButton = true;
+
 
   $: {
     if (asset.stackCount && asset.stack) {
@@ -561,6 +565,11 @@
       await handleError(error, `Unable to unstack`);
     }
   };
+
+  const detectWeapons = () => {
+    isShowWeaponsDetect = true;
+  };
+
 </script>
 
 <section
@@ -576,6 +585,7 @@
         showCopyButton={canCopyImagesToClipboard && asset.type === AssetTypeEnum.Image}
         showZoomButton={asset.type === AssetTypeEnum.Image}
         showMotionPlayButton={!!asset.livePhotoVideoId}
+        showWeaponsDetectionButton={shouldShowWeaponsDetectionButton}
         showDownloadButton={shouldShowDownloadButton}
         showDetailButton={shouldShowDetailButton}
         showSlideshow={!!assetStore}
@@ -594,6 +604,7 @@
         on:runJob={({ detail: job }) => handleRunJob(job)}
         on:playSlideShow={() => ($slideshowState = SlideshowState.PlaySlideshow)}
         on:unstack={handleUnstack}
+        on:searchWeapons={() => detectWeapons()}
       />
     </div>
   {/if}
@@ -768,6 +779,13 @@
       on:album={({ detail }) => handleAddToAlbum(detail)}
       on:close={() => (isShowAlbumPicker = false)}
     />
+  {/if}
+
+  {#if isShowWeaponsDetect}
+  <WeaponsDetectionWindow
+    assetId={asset.id}
+    on:close={() => (isShowWeaponsDetect = false)}
+  />
   {/if}
 
   {#if isShowDeleteConfirmation}

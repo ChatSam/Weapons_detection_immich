@@ -50,6 +50,10 @@ _INSIGHTFACE_MODELS = {
     "buffalo_s",
 }
 
+_WEAPONS_DETECTION_MODELS = {
+    "yoloV8",
+}
+
 
 SUPPORTED_PROVIDERS = ["CUDAExecutionProvider", "OpenVINOExecutionProvider", "CPUExecutionProvider"]
 
@@ -67,3 +71,6 @@ def is_mclip(model_name: str) -> bool:
 
 def is_insightface(model_name: str) -> bool:
     return clean_name(model_name) in _INSIGHTFACE_MODELS
+
+def is_weapons_detection(model_name: str) -> bool:
+    return clean_name(model_name) in _WEAPONS_DETECTION_MODELS

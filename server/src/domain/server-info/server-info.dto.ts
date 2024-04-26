@@ -96,6 +96,7 @@ export class ServerFeaturesDto implements FeatureFlags {
   smartSearch!: boolean;
   configFile!: boolean;
   facialRecognition!: boolean;
+  weaponsDetection!: boolean;
   map!: boolean;
   trash!: boolean;
   reverseGeocoding!: boolean;

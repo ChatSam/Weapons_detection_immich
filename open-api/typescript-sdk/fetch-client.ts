@@ -631,6 +631,7 @@ export type ServerFeaturesDto = {
     sidecar: boolean;
     smartSearch: boolean;
     trash: boolean;
+    weaponsDetection: boolean;
 };
 export type ServerMediaTypesResponseDto = {
     image: string[];
@@ -770,7 +771,7 @@ export type SystemConfigLoggingDto = {
     level: LogLevel;
 };
 export type ClipMode = "vision" | "text";
-export type ModelType = "facial-recognition" | "clip";
+export type ModelType = "facial-recognition" | "clip" | "weapons-detection";
 export type ClipConfig = {
     enabled: boolean;
     mode?: ClipMode;
@@ -785,11 +786,20 @@ export type RecognitionConfig = {
     modelName: string;
     modelType?: ModelType;
 };
+export type MediaMode = "video" | "image";
+export type WeaponsDetectConfig = {
+    enabled: boolean;
+    minScore: number;
+    mode?: MediaMode;
+    modelName: string;
+    modelType?: ModelType;
+};
 export type SystemConfigMachineLearningDto = {
     clip: ClipConfig;
     enabled: boolean;
     facialRecognition: RecognitionConfig;
     url: string;
+    weaponsDetection: WeaponsDetectConfig;
 };
 export type SystemConfigMapDto = {
     darkStyle: string;
@@ -905,6 +915,14 @@ export type CreateProfileImageDto = {
 export type CreateProfileImageResponseDto = {
     profileImagePath: string;
     userId: string;
+};
+export type WeaponsDetectItem = {
+    image: any;
+    score: number;
+};
+export type WeaponsDetectResponseDto = {
+    data: WeaponsDetectItem[];
+    id: string;
 };
 export function getActivities({ albumId, assetId, level, $type, userId }: {
     albumId: string;
@@ -2522,5 +2540,15 @@ export function restoreUser({ id }: {
     }>(`/user/${encodeURIComponent(id)}/restore`, {
         ...opts,
         method: "POST"
+    }));
+}
+export function getWeaponsDetect({ id }: {
+    id: string;
+}, opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: WeaponsDetectResponseDto;
+    }>(`/weapons-detect/${encodeURIComponent(id)}`, {
+        ...opts
     }));
 }

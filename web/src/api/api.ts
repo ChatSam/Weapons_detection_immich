@@ -9,6 +9,7 @@ import {
   AuthenticationApi,
   DownloadApi,
   FaceApi,
+  WeaponsDetectApi,
   JobApi,
   JobName,
   LibraryApi,
@@ -37,6 +38,7 @@ class ImmichApi {
   public auditApi: AuditApi;
   public authenticationApi: AuthenticationApi;
   public faceApi: FaceApi;
+  public weaponsDetectApi: WeaponsDetectApi;
   public jobApi: JobApi;
   public keyApi: APIKeyApi;
   public oauthApi: OAuthApi;
@@ -67,6 +69,7 @@ class ImmichApi {
     this.assetApi = new AssetApi(this.config);
     this.authenticationApi = new AuthenticationApi(this.config);
     this.faceApi = new FaceApi(this.config);
+    this.weaponsDetectApi = new WeaponsDetectApi(this.config);
     this.jobApi = new JobApi(this.config);
     this.keyApi = new APIKeyApi(this.config);
     this.oauthApi = new OAuthApi(this.config);
