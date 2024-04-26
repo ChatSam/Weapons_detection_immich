@@ -4,8 +4,8 @@
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
-import * as Oazapfts from "oazapfts/lib/runtime";
-import * as QS from "oazapfts/lib/runtime/query";
+import * as Oazapfts from "@oazapfts/runtime";
+import * as QS from "@oazapfts/runtime/query";
 export const defaults: Oazapfts.Defaults<Oazapfts.CustomHeaders> = {
     headers: {},
     baseUrl: "/api",
@@ -917,7 +917,8 @@ export type CreateProfileImageResponseDto = {
     userId: string;
 };
 export type WeaponsDetectItem = {
-    image: any;
+    /** base-64 encoded image */
+    image: string;
     score: number;
 };
 export type WeaponsDetectResponseDto = {

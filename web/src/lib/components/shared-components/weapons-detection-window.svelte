@@ -31,12 +31,12 @@
     <svelte:fragment slot="title">
       <span class="flex place-items-center gap-2">
         <p class="font-medium">
-          Detected Weapons
+          Weapon Detected!
         </p>
       </span>
     </svelte:fragment>
   
-    <div class="mb-2 flex max-h-[400px] flex-col">
+    <div class="mb-2 flex max-h-[90vh] flex-col">
       {#if loading}
         {#each { length: 3 } as _}
           <div class="flex animate-pulse gap-4 px-6 py-2">
