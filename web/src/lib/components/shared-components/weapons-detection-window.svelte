@@ -1,11 +1,12 @@
 <script lang="ts">
-    import {type WeaponsDetectItem, api } from '@api';
+    import {api } from '@api';
     import { createEventDispatcher, onMount } from 'svelte';
     import BaseModal from './base-modal.svelte';
     import WeaponsListItem from '../asset-viewer/weapons-list-item.svelte';
     import { handleError } from '$lib/utils/handle-error';
   
-    let weapons: WeaponsDetectItem[] = [];
+    let weaponFilePath: string = '';
+    let mediaMode: string = '';
     let loading = true;
     export let assetId: string = '';
   
@@ -17,7 +18,8 @@
       
       try {
         const { data } = await api.weaponsDetectApi.getWeaponsDetect({ id: assetId });
-        weapons = data.data;
+        weaponFilePath = data.filePath;
+        mediaMode = data.mediaMode;
       } catch (error) {
       handleError(error, "Internal Server Error! Cannot Detect Weapons.");
     }
@@ -53,10 +55,14 @@
       {:else}
         <!-- svelte-ignore a11y-autofocus -->
         <div class="immich-scrollbar overflow-y-auto">
-          {#if weapons.length > 0}
-            {#each weapons as weapon (weapon.image)}
-              <WeaponsListItem {weapon} />
-            {/each}
+          {#if weaponFilePath !== ''}
+            <div class="flex gap-4 px-6 py-2">
+              <div class="h-full w-full shrink-0 bg-slate-300">
+            <!-- {#each weapons as weapon (weapon.image)} -->
+                <WeaponsListItem assetId={assetId} weaponFilePath={weaponFilePath} mediaMode={mediaMode} />
+            <!-- {/each} -->
+              </div>
+            </div>
           {:else}
             <p class="px-5 py-1 text-sm">No Weapons Detected!</p>
           {/if}

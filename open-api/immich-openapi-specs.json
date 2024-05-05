@@ -9990,6 +9990,9 @@
       },
       "WeaponsDetectConfig": {
         "properties": {
+          "assetId": {
+            "type": "string"
+          },
           "enabled": {
             "type": "boolean"
           },
@@ -10014,38 +10017,29 @@
         ],
         "type": "object"
       },
-      "WeaponsDetectItem": {
-        "properties": {
-          "image": {
-            "description": "base-64 encoded image",
-            "type": "string"
-          },
-          "score": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "image",
-          "score"
-        ],
-        "type": "object"
-      },
       "WeaponsDetectResponseDto": {
         "properties": {
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/WeaponsDetectItem"
-            },
-            "type": "array"
+          "filePath": {
+            "description": "Path to the media file",
+            "type": "string"
           },
           "id": {
             "format": "uuid",
             "type": "string"
+          },
+          "mediaMode": {
+            "description": "Media type (image|video)",
+            "enum": [
+              "video",
+              "image"
+            ],
+            "type": "string"
           }
         },
         "required": [
-          "data",
-          "id"
+          "filePath",
+          "id",
+          "mediaMode"
         ],
         "type": "object"
       }

@@ -4881,6 +4881,12 @@ export type VideoCodec = typeof VideoCodec[keyof typeof VideoCodec];
 export interface WeaponsDetectConfig {
     /**
      * 
+     * @type {string}
+     * @memberof WeaponsDetectConfig
+     */
+    'assetId'?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof WeaponsDetectConfig
      */
@@ -4915,41 +4921,36 @@ export interface WeaponsDetectConfig {
 /**
  * 
  * @export
- * @interface WeaponsDetectItem
- */
-export interface WeaponsDetectItem {
-    /**
-     * base-64 encoded image
-     * @type {string}
-     * @memberof WeaponsDetectItem
-     */
-    'image': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof WeaponsDetectItem
-     */
-    'score': number;
-}
-/**
- * 
- * @export
  * @interface WeaponsDetectResponseDto
  */
 export interface WeaponsDetectResponseDto {
     /**
-     * 
-     * @type {Array<WeaponsDetectItem>}
+     * Path to the media file
+     * @type {string}
      * @memberof WeaponsDetectResponseDto
      */
-    'data': Array<WeaponsDetectItem>;
+    'filePath': string;
     /**
      * 
      * @type {string}
      * @memberof WeaponsDetectResponseDto
      */
     'id': string;
+    /**
+     * Media type (image|video)
+     * @type {string}
+     * @memberof WeaponsDetectResponseDto
+     */
+    'mediaMode': WeaponsDetectResponseDtoMediaModeEnum;
 }
+
+export const WeaponsDetectResponseDtoMediaModeEnum = {
+    Video: 'video',
+    Image: 'image'
+} as const;
+
+export type WeaponsDetectResponseDtoMediaModeEnum = typeof WeaponsDetectResponseDtoMediaModeEnum[keyof typeof WeaponsDetectResponseDtoMediaModeEnum];
+
 
 /**
  * APIKeyApi - axios parameter creator

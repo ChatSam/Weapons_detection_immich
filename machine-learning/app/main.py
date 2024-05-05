@@ -102,9 +102,12 @@ async def predict(
     options: str = Form(default="{}"),
     text: str | None = Form(default=None),
     image: UploadFile | None = None,
+    video: UploadFile | None = Form(default=None),
 ) -> Any:
     if image is not None:
         inputs: str | bytes = await image.read()
+    elif video is not None:
+        inputs: str | bytes = "meh"
     elif text is not None:
         inputs = text
     else:
@@ -117,7 +120,22 @@ async def predict(
     if model_type == ModelType.WEAPONS_DETECTION:
         image = inputs
         detection_response = threat_detector.run_image_prediction_byte_stream(image)
-        return ORJSONResponse(detection_response)
+
+        filepath = "/ml-results/test.jpg"
+        assetId = kwargs.pop("assetId", "") #use for assetID
+        #Save image to folder /ml-results as a JPG file
+        with open(filepath, 'wb') as f:
+            f.write(image)
+        # video = inputs
+        # filepath = "/ml-results/videotest.mp4"
+        # with open(filepath, 'wb') as f:
+        #     f.write(video)
+        # Save video to folder /ml-results as a MP4 file
+
+        weapon: DetectedWeapons = {
+            "filePath": filepath,
+        }
+        return ORJSONResponse(weapon)
 
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
