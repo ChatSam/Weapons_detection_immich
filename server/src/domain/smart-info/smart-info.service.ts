@@ -19,6 +19,7 @@ import { AccessCore, Permission } from '../access';
 import { AuthDto } from '../auth';
 import { WeaponsDetectResponseDto } from './dto/smart-info.dto';
 import { AssetType } from '@app/infra/entities';
+import e from 'express';
 
 @Injectable()
 export class SmartInfoService {
@@ -102,6 +103,9 @@ export class SmartInfoService {
   }
 
   async handleDetectWeapons(auth: AuthDto, id: string): Promise<WeaponsDetectResponseDto> {
+
+    let response: WeaponsDetectResponseDto = {id: id, filePath: '', mediaMode: MediaMode.IMAGE};
+
     await this.access.requirePermission(auth, Permission.ASSET_READ, id);
 
     const { machineLearning } = await this.configCore.getConfig();
@@ -114,26 +118,59 @@ export class SmartInfoService {
     if (!asset) {
       throw new BadRequestException('Asset not found');
     }
-
-    if (!asset.resizePath) {
-      throw new BadRequestException('Asset has no image file path');
+    //if the asset doesn't have a resize path or original path, it can't be processed
+    if (!asset.resizePath && !asset.originalPath) {
+      throw new BadRequestException('Asset has no image or video file path');
     }
+    // if (!asset.resizePath) {
+    //   throw new BadRequestException('Asset has no image file path');
+    // }
 
-    const detectedWeapons = await this.machineLearning.detectWeapons(
-      machineLearning.url,
-      { imagePath: asset.resizePath },
-      { ...machineLearning.weaponsDetection,
-        mode: asset.type === AssetType.VIDEO ? MediaMode.VIDEO : MediaMode.IMAGE
-      },
-    );
+    if (asset.type === AssetType.VIDEO && asset.originalPath) {
+      const detectedWeapons = await this.machineLearning.detectWeaponsInVideo(
+        machineLearning.url,
+        { videoPath: asset.originalPath },
+        { ...machineLearning.weaponsDetection,
+          assetId: id,
+        }
+      );
 
-    const response = {
-      id: id,
-      data: detectedWeapons.map((weapon) => ({
-        image: weapon.image,
-        score: weapon.score,
-      })),
-    };
+      response = {
+        id: id,
+        filePath: detectedWeapons.filePath,
+        mediaMode: MediaMode.VIDEO,
+      };
+    }
+    else if (asset.type === AssetType.IMAGE && asset.resizePath) {
+      const detectedWeapons = await this.machineLearning.detectWeaponsInImage(
+        machineLearning.url,
+        { imagePath: asset.resizePath },
+        { ...machineLearning.weaponsDetection,
+          assetId: id,
+        }
+      );
+
+      response = {
+        id: id,
+        filePath: detectedWeapons.filePath,
+        mediaMode: MediaMode.IMAGE,
+      };
+    }
+    // const detectedWeapons = await this.machineLearning.detectWeapons(
+    //   machineLearning.url,
+    //   { imagePath: asset.resizePath },
+    //   { ...machineLearning.weaponsDetection,
+    //     mode: asset.type === AssetType.VIDEO ? MediaMode.VIDEO : MediaMode.IMAGE
+    //   },
+    // );
+
+    // const response = {
+    //   id: id,
+    //   data: detectedWeapons.map((weapon) => ({
+    //     image: weapon.image,
+    //     score: weapon.score,
+    //   })),
+    // };
 
     return response;
   }

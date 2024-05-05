@@ -788,6 +788,7 @@ export type RecognitionConfig = {
 };
 export type MediaMode = "video" | "image";
 export type WeaponsDetectConfig = {
+    assetId?: string;
     enabled: boolean;
     minScore: number;
     mode?: MediaMode;
@@ -916,14 +917,12 @@ export type CreateProfileImageResponseDto = {
     profileImagePath: string;
     userId: string;
 };
-export type WeaponsDetectItem = {
-    /** base-64 encoded image */
-    image: string;
-    score: number;
-};
 export type WeaponsDetectResponseDto = {
-    data: WeaponsDetectItem[];
+    /** Path to the media file */
+    filePath: string;
     id: string;
+    /** Media type (image|video) */
+    mediaMode: "video" | "image";
 };
 export function getActivities({ albumId, assetId, level, $type, userId }: {
     albumId: string;

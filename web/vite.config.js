@@ -21,6 +21,12 @@ export default defineConfig({
     },
   },
   server: {
+
+    fs: {
+      // Add the 'ml-results' directory to the allow list
+      allow: ['ml-results'],
+    },
+
     // connect to a remote backend during web-only development
     proxy: {
       '/api': upstream,

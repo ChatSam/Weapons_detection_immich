@@ -123,6 +123,10 @@ class ImmichApi {
     return this.createUrl(path, { isThumb, isWeb, key: this.getKey() });
   }
 
+  public getPredictionUrl(filePath: string) {
+    return this.createUrl(filePath);
+  }
+
   public getAssetThumbnailUrl(...[assetId, format]: ApiParameters<typeof AssetApiFp, 'getAssetThumbnail'>) {
     const path = `/asset/thumbnail/${assetId}`;
     return this.createUrl(path, { format, key: this.getKey() });

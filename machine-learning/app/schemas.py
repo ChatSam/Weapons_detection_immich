@@ -50,9 +50,12 @@ class Face(TypedDict):
     imageHeight: int
     score: float
 
+# class DetectedWeapons(TypedDict):
+#     image: str
+#     score: float
+
 class DetectedWeapons(TypedDict):
-    image: str
-    score: float
+    filePath: str
 
 def has_profiling(obj: Any) -> TypeGuard[HasProfiling]:
     return hasattr(obj, "profiling") and isinstance(obj.profiling, dict)

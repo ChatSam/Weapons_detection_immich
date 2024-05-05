@@ -67,6 +67,7 @@ services:
       - ../web:/usr/src/app
       - ../open-api/:/usr/src/open-api/
       - /usr/src/app/node_modules
+      - ml-results:/usr/src/app/ml-results
     ulimits:
       nofile:
         soft: 1048576
@@ -91,6 +92,7 @@ services:
     volumes:
       - ../machine-learning:/usr/src/app
       - model-cache:/cache
+      - ml-results:/ml-results
     env_file:
       - .env
     depends_on:
@@ -117,3 +119,5 @@ services:
 
 volumes:
   model-cache:
+  ml-results:
+

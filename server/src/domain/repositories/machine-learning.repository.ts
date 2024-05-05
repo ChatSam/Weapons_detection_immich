@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { CLIPConfig, RecognitionConfig, WeaponsDetectConfig } from '../smart-info/dto';
 
 export const IMachineLearningRepository = 'IMachineLearningRepository';
@@ -9,7 +10,9 @@ export interface VisionModelInput {
 export interface TextModelInput {
   text: string;
 }
-
+export interface VideoModelInput {
+  videoPath: string;
+}
 export interface BoundingBox {
   x1: number;
   y1: number;
@@ -25,9 +28,13 @@ export interface DetectFaceResult {
   embedding: number[];
 }
 
+// export interface DetectWeaponsResult {
+//   image: string; // base64-encoded image
+//   score: number;
+// }
+
 export interface DetectWeaponsResult {
-  image: string; // base64-encoded image
-  score: number;
+  filePath: string; //Path to the image
 }
 
 export enum ModelType {
@@ -51,5 +58,7 @@ export interface IMachineLearningRepository {
   encodeImage(url: string, input: VisionModelInput, config: CLIPConfig): Promise<number[]>;
   encodeText(url: string, input: TextModelInput, config: CLIPConfig): Promise<number[]>;
   detectFaces(url: string, input: VisionModelInput, config: RecognitionConfig): Promise<DetectFaceResult[]>;
-  detectWeapons(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult[]>;
+  // detectWeapons(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult[]>;
+  detectWeaponsInImage(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult>;
+  detectWeaponsInVideo(url: string, input: VideoModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult>;
 }

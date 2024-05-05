@@ -96,9 +96,12 @@ async def predict(
     options: str = Form(default="{}"),
     text: str | None = Form(default=None),
     image: UploadFile | None = None,
+    video: UploadFile | None = Form(default=None),
 ) -> Any:
     if image is not None:
         inputs: str | bytes = await image.read()
+    elif video is not None:
+        inputs: str | bytes = "meh"
     elif text is not None:
         inputs = text
     else:
@@ -110,23 +113,21 @@ async def predict(
 
     if model_type == ModelType.WEAPONS_DETECTION:
         image = inputs
-        if isinstance(image, bytes):
-            decoded_image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
-        else:
-            decoded_image = image
+        filepath = "/ml-results/test.jpg"
+        #Save image to folder /ml-results as a JPG file
+        with open(filepath, 'wb') as f:
+            f.write(image)
+        # video = inputs
+        # filepath = "/ml-results/videotest.mp4"
+        # with open(filepath, 'wb') as f:
+        #     f.write(video)
+        # Save video to folder /ml-results as a MP4 file
 
-        # Encode image to base64 string
-        _, buffer = cv2.imencode('.jpg', decoded_image)
-        encoded_string = base64.b64encode(buffer).decode('utf-8')
-
-        outputs = []
         weapon: DetectedWeapons = {
-                "image": "data:image/jpeg;base64," + encoded_string,  # Prefix with data URI"
-                "score": 0.7
-            }
-        outputs.append(weapon)
-        return ORJSONResponse(outputs)
-    #     raise HTTPException(501, "Weapons detection models are not yet supported")
+            "filePath": filepath,
+        }
+        return ORJSONResponse(weapon)
+    
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
     outputs = await run(model.predict, inputs)

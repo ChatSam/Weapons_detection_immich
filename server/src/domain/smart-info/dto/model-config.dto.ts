@@ -59,4 +59,11 @@ export class WeaponsDetectConfig extends ModelConfig {
   @Optional()
   @ApiProperty({ enumName: 'MediaMode', enum: MediaMode })
   mode?: MediaMode;
+
+  // Add asset id to the config
+  @IsString()
+  @Optional()
+  @ApiProperty({ type: 'string' })
+  assetId?: string;
+  
 }

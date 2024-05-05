@@ -8,17 +8,20 @@ import {
   RecognitionConfig,
   TextModelInput,
   VisionModelInput,
+  VideoModelInput,
   WeaponsDetectConfig,
   DetectWeaponsResult,
+  MediaMode,
 } from '@app/domain';
 import { Injectable } from '@nestjs/common';
 import { readFile } from 'node:fs/promises';
+import { createReadStream } from 'node:fs'; 
 
 const errorPrefix = 'Machine learning request';
 
 @Injectable()
 export class MachineLearningRepository implements IMachineLearningRepository {
-  private async predict<T>(url: string, input: TextModelInput | VisionModelInput, config: ModelConfig): Promise<T> {
+  private async predict<T>(url: string, input: TextModelInput | VisionModelInput | VideoModelInput, config: ModelConfig): Promise<T> {
     const formData = await this.getFormData(input, config);
 
     const res = await fetch(`${url}/predict`, { method: 'POST', body: formData }).catch((error: Error | any) => {
@@ -52,11 +55,18 @@ export class MachineLearningRepository implements IMachineLearningRepository {
     } as CLIPConfig);
   }
 
-  detectWeapons(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult[]> {
-    return this.predict<DetectWeaponsResult[]>(url, input, { ...config, modelType: ModelType.WEAPONS_DETECTION });
+  // detectWeapons(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult[]> {
+  //   return this.predict<DetectWeaponsResult[]>(url, input, { ...config, modelType: ModelType.WEAPONS_DETECTION });
+  // }
+
+  detectWeaponsInImage(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult> {
+    return this.predict<DetectWeaponsResult>(url, input, { ...config, modelType: ModelType.WEAPONS_DETECTION, mode: MediaMode.IMAGE} as WeaponsDetectConfig);
+  }
+  detectWeaponsInVideo(url: string, input: VideoModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult> {
+    return this.predict<DetectWeaponsResult>(url, input, { ...config, modelType: ModelType.WEAPONS_DETECTION, mode: MediaMode.VIDEO} as WeaponsDetectConfig);
   }
 
-  async getFormData(input: TextModelInput | VisionModelInput, config: ModelConfig): Promise<FormData> {
+  async getFormData(input: TextModelInput | VisionModelInput | VideoModelInput, config: ModelConfig): Promise<FormData> {
     const formData = new FormData();
     const { enabled, modelName, modelType, ...options } = config;
     if (!enabled) {
@@ -72,7 +82,11 @@ export class MachineLearningRepository implements IMachineLearningRepository {
     }
     if ('imagePath' in input) {
       formData.append('image', new Blob([await readFile(input.imagePath)]));
-    } else if ('text' in input) {
+    } 
+    else if ('videoPath' in input) {
+      formData.append('video', createReadStream(input.videoPath) as any);
+    }
+    else if ('text' in input) {
       formData.append('text', input.text);
     } else {
       throw new Error('Invalid input');
