@@ -24,7 +24,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
   PYTHONUNBUFFERED=1 \
   PIP_NO_CACHE_DIR=true \
   VIRTUAL_ENV="/opt/venv" \
-  PATH="/opt/venv/bin:${PATH}"
+  PATH="/opt/venv/bin:${PATH}" \
+  PIP_DEFAULT_TIMEOUT=500
 
 RUN pip install --upgrade pip && pip install poetry
 RUN poetry config installer.max-workers 10 && \
@@ -33,6 +34,9 @@ RUN python3 -m venv /opt/venv
 
 COPY poetry.lock pyproject.toml ./
 RUN poetry install --sync --no-interaction --no-ansi --no-root --with ${DEVICE} --without dev
+
+RUN pip install ultralytics
+RUN pip install opencv-python-headless==4.8.1.78
 
 FROM python:3.11-slim-bookworm@sha256:d11b9bd5e49ea7401753d78f4d3b56f3aec952b85b49bcae88981f0452818e0b as prod-cpu
 
