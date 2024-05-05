@@ -17,6 +17,8 @@ from app.schemas import ModelType, DetectedWeapons
 
 from .base import InferenceModel
 
+from PIL import Image
+from ultralytics import YOLO
 
 class WeaponsDetector(InferenceModel):
     _model_type = ModelType.WEAPONS_DETECTION
@@ -74,7 +76,68 @@ class WeaponsDetector(InferenceModel):
 
     def configure(self, **model_kwargs: Any) -> None:
         self.det_model.det_thresh = model_kwargs.pop("minScore", self.det_model.det_thresh)
+
+
+class ThreatDetector:
+    def __init__(self, model_path=None):
+        if model_path:
+            self.initialize_model(model_path)
+        else:
+            model_path = './train9_model_v1.pt'
+            self.initialize_model(model_path)
+
+
+    def run_prediction_image(self, image, confidence=0.15):
+        #model(source=1, show=True, conf=0.4, save=True)
+        prediction_result = self.model(image, conf=confidence)
+        return prediction_result 
+    
+
+    def run_image_prediction_byte_stream(self, image):
+        if isinstance(image, bytes):
+            #detected_image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
+            image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
+
+            #detection_result,detection_image = threat_detector.run_prediction_bitstream (byte_image=image)
+            detection_result = self.run_prediction_image(image)[0]
+            detected_image = detection_result.plot()
+        else:
+            detected_image = image
+
+        # Encode image to base64 string
+        _, buffer = cv2.imencode('.jpg', detected_image)
+        encoded_string = base64.b64encode(buffer).decode('utf-8')
+
+        outputs = []
+        weapon_detection_res = {
+                "image": "data:image/jpeg;base64," + encoded_string,  # Prefix with data URI"
+                "score": 0.0
+            }
         
+        outputs.append(weapon_detection_res)
+        return outputs
+
+    def run_prediction_bitstream_deprecated(self, byte_image, save_path=None):
+        reconstructed_image = Image.open(byte_image)
+        prediction_result = self.run_prediction_image(reconstructed_image)[0]
+
+        if save_path:
+            detection_image = self.create_detected_image(prediction_result, save_path)
+            print (f"Detection saved at {save_path}")
+
+        return prediction_result, detection_image
+
+
+    def create_detected_image(self, detected_result, save_path):
+        """ Saves the thumbnails of detection
+        """
+        return detected_result.plot(save=True, filename=save_path)
+         
+
+    def initialize_model(self, model_path):
+        self.model = YOLO(model_path)
+
+
     # @abstractmethod
     # def tokenize(self, text: str) -> dict[str, NDArray[np.int32]]:
     #     pass

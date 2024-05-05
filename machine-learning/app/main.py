@@ -39,6 +39,12 @@ active_requests = 0
 last_called: float | None = None
 
 
+### -- test code
+from .models.weapons_detector import ThreatDetector
+threat_detector = ThreatDetector('./app/models/train9_model_v1.pt')
+#threat_detector = None
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
     global thread_pool
@@ -110,23 +116,9 @@ async def predict(
 
     if model_type == ModelType.WEAPONS_DETECTION:
         image = inputs
-        if isinstance(image, bytes):
-            decoded_image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
-        else:
-            decoded_image = image
+        detection_response = threat_detector.run_image_prediction_byte_stream(image)
+        return ORJSONResponse(detection_response)
 
-        # Encode image to base64 string
-        _, buffer = cv2.imencode('.jpg', decoded_image)
-        encoded_string = base64.b64encode(buffer).decode('utf-8')
-
-        outputs = []
-        weapon: DetectedWeapons = {
-                "image": "data:image/jpeg;base64," + encoded_string,  # Prefix with data URI"
-                "score": 0.7
-            }
-        outputs.append(weapon)
-        return ORJSONResponse(outputs)
-    #     raise HTTPException(501, "Weapons detection models are not yet supported")
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
     outputs = await run(model.predict, inputs)
