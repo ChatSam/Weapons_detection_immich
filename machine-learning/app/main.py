@@ -114,6 +114,7 @@ async def predict(
     if model_type == ModelType.WEAPONS_DETECTION:
         image = inputs
         filepath = "/ml-results/test.jpg"
+        assetId = kwargs.pop("assetId", "") #use for assetID
         #Save image to folder /ml-results as a JPG file
         with open(filepath, 'wb') as f:
             f.write(image)
