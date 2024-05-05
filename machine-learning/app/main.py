@@ -96,12 +96,12 @@ async def predict(
     options: str = Form(default="{}"),
     text: str | None = Form(default=None),
     image: UploadFile | None = None,
-    video: UploadFile | None = Form(default=None),
+    video: str | None = Form(alias="videoFilePath", default=None)
 ) -> Any:
     if image is not None:
         inputs: str | bytes = await image.read()
     elif video is not None:
-        inputs: str | bytes = "meh"
+        inputs = video
     elif text is not None:
         inputs = text
     else:
@@ -112,22 +112,27 @@ async def predict(
         raise HTTPException(400, f"Invalid options JSON: {options}")
 
     if model_type == ModelType.WEAPONS_DETECTION:
-        image = inputs
-        filepath = "/ml-results/test.jpg"
-        assetId = kwargs.pop("assetId", "") #use for assetID
-        #Save image to folder /ml-results as a JPG file
-        with open(filepath, 'wb') as f:
-            f.write(image)
-        # video = inputs
-        # filepath = "/ml-results/videotest.mp4"
-        # with open(filepath, 'wb') as f:
-        #     f.write(video)
-        # Save video to folder /ml-results as a MP4 file
+        assetId = kwargs.get("assetId", "")
+        mediaType = kwargs.get("mode", "")
+        if mediaType == "image":
+            image = inputs
+            filepath = "/ml-results/test.jpg"
+            #Save image to folder /ml-results as a JPG file
+            with open(filepath, 'wb') as f:
+                f.write(image)
 
-        weapon: DetectedWeapons = {
-            "filePath": filepath,
-        }
-        return ORJSONResponse(weapon)
+            weapon: DetectedWeapons = {
+                "filePath": filepath,
+            }
+            return ORJSONResponse(weapon)
+        elif mediaType == "video":
+            videoFilePath = inputs
+            filepath = videoFilePath
+            #Save image to folder /ml-results as a JPG file
+            weapon: DetectedWeapons = {
+                "filePath": filepath,
+            }
+            return ORJSONResponse(weapon)
     
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
