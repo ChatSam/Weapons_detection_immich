@@ -119,41 +119,40 @@ class ThreatDetector:
                 }
         
         return weapon_detection_res
-    
 
-    def return_dummy_video(self):
-        with open('./app/models/test_video.mp4', 'rb') as video_file:
-            encoded_string = base64.b64encode(video_file.read()).decode('utf-8')
 
-        outputs = []
+    def run_prediction_video(self, video_path, save_directory, confidence=0.2):
+        video_save_file_path = save_directory / f"detected_{video_path.name}"
+
+        if not video_save_file_path.exists():
+            self.predict_video(str(video_path), str(video_save_file_path), confidence)
+
         weapon_detection_res = {
-            "video": "data:video/mp4;base64," + encoded_string,  # Prefix with data URI
-            "score": 0.0
+                "filePath": str(video_save_file_path)
         }
-
-        outputs.append(weapon_detection_res)
-
-        return outputs
-
-
-    def run_prediction_video(self, video_path, output_path, confidence=0.2):
+       
+        return weapon_detection_res
+        
+        
+    def predict_video(self, video_path, output_path, confidence):
+        print ("Output: ", output_path)
         video_cap = cv2.VideoCapture(str(video_path))
         fps = video_cap.get(cv2.CAP_PROP_FPS)
         frame_size = (int(video_cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
-        fourcc = cv2.VideoWriter_fourcc(*'X264')
+        #fourcc = cv2.VideoWriter_fourcc(*'X264')
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        #fourcc = cv2.VideoWriter_fourcc(*'h264')
+
         out = cv2.VideoWriter(output_path, fourcc, fps, frame_size)
 
         ret = True 
-
         while ret:
             ret, frame = video_cap.read()
 
             if ret:
                 results = self.model.track(frame, persist=True, conf=confidence)
-
                 frame_ = results[0].plot()
-
                 out.write(frame_)  # Write the frame into the file 'output.avi'
 
         video_cap.release()

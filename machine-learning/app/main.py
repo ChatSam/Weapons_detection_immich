@@ -118,8 +118,6 @@ async def predict(
         raise HTTPException(400, f"Invalid options JSON: {options}")
 
     if model_type == ModelType.WEAPONS_DETECTION:
- 
-
         mediaType = kwargs.get("mode", "")
         if mediaType == "image":
             image = inputs
@@ -130,16 +128,18 @@ async def predict(
                                                                                 save_directory)
 
             return ORJSONResponse(detection_response)
+            
         elif mediaType == "video":
-            videoFilePath = inputs
-            fileName = videoFilePath.split("/")[-1]
-            filepath = f"/ml-results/{fileName}"
-            #Save image to folder /ml-results as a JPG file
-            weapon: DetectedWeapons = {
-                "filePath": filepath,
-            }
-            return ORJSONResponse(weapon)
-    
+            video_file_path = Path(inputs)
+            save_directory = Path("/ml-results/")
+            video_file_path = save_directory / video_file_path.name
+
+            detection_response = threat_detector.run_prediction_video(video_file_path, 
+                                                                      save_directory)
+
+            return ORJSONResponse(detection_response)
+        
+
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
     outputs = await run(model.predict, inputs)
