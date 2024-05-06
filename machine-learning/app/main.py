@@ -127,7 +127,8 @@ async def predict(
             return ORJSONResponse(weapon)
         elif mediaType == "video":
             videoFilePath = inputs
-            filepath = videoFilePath
+            fileName = videoFilePath.split("/")[-1]
+            filepath = f"/ml-results/{fileName}"
             #Save image to folder /ml-results as a JPG file
             weapon: DetectedWeapons = {
                 "filePath": filepath,
