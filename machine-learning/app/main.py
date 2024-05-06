@@ -119,13 +119,16 @@ async def predict(
 
     if model_type == ModelType.WEAPONS_DETECTION:
         mediaType = kwargs.get("mode", "")
+        detection_threshold = eval(options).get("minScore", 0.2)
+
         if mediaType == "image":
             image = inputs
             save_directory = Path("/ml-results/")
             asset_id = kwargs.get("assetId", None)
             detection_response = threat_detector.run_image_prediction_byte_stream(image, 
                                                                                 asset_id, 
-                                                                                save_directory)
+                                                                                save_directory,
+                                                                                detection_threshold)
 
             return ORJSONResponse(detection_response)
             
@@ -135,7 +138,8 @@ async def predict(
             video_file_path = save_directory / video_file_path.name
 
             detection_response = threat_detector.run_prediction_video(video_file_path, 
-                                                                      save_directory)
+                                                                      save_directory,
+                                                                      detection_threshold)
 
             return ORJSONResponse(detection_response)
         

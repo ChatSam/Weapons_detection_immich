@@ -20,6 +20,7 @@ from .base import InferenceModel
 from PIL import Image
 from ultralytics import YOLO
 from pathlib import Path
+import os
 
 class WeaponsDetector(InferenceModel):
     _model_type = ModelType.WEAPONS_DETECTION
@@ -94,10 +95,10 @@ class ThreatDetector:
         return prediction_result 
     
 
-    def run_image_prediction_byte_stream(self, image, asset_id, save_directory):
-
+    def run_image_prediction_byte_stream(self, image, asset_id, save_directory, confidence):
         file_path = save_directory / f"{asset_id}.jpg"
-
+        detection_made = False
+    
         if file_path.exists():
             weapon_detection_res = {
                 "filePath": str(file_path)
@@ -106,12 +107,13 @@ class ThreatDetector:
         else:
             if isinstance(image, bytes):
                 image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
-                detection_result = self.run_prediction_image(image)[0]
+                detection_result = self.run_prediction_image(image, confidence)[0]
+                detection_made = bool(len(detection_result))
                 detected_image = detection_result.plot()
             else:
                 detected_image = image
 
-            if asset_id:
+            if asset_id and detection_made:
                 cv2.imwrite(str(file_path), detected_image)
             
             weapon_detection_res = {
@@ -135,14 +137,11 @@ class ThreatDetector:
         
         
     def predict_video(self, video_path, output_path, confidence):
-        print ("Output: ", output_path)
         video_cap = cv2.VideoCapture(str(video_path))
         fps = video_cap.get(cv2.CAP_PROP_FPS)
         frame_size = (int(video_cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-
-        #fourcc = cv2.VideoWriter_fourcc(*'X264')
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        #fourcc = cv2.VideoWriter_fourcc(*'h264')
+        detection_made = False
 
         out = cv2.VideoWriter(output_path, fourcc, fps, frame_size)
 
@@ -153,10 +152,17 @@ class ThreatDetector:
             if ret:
                 results = self.model.track(frame, persist=True, conf=confidence)
                 frame_ = results[0].plot()
-                out.write(frame_)  # Write the frame into the file 'output.avi'
+                out.write(frame_)
+
+                if detection_made is False:
+                    detection_made = bool(len(results[0]))
 
         video_cap.release()
-        out.release()  # Release the VideoWriter
+        out.release()
+
+        # if no weapons are detected, delete the processed video
+        if detection_made is False:
+            os.remove(output_path)
 
 
     def run_prediction_bitstream_deprecated(self, byte_image, save_path=None):
