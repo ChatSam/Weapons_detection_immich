@@ -19,6 +19,7 @@ from .base import InferenceModel
 
 from PIL import Image
 from ultralytics import YOLO
+from pathlib import Path
 
 class WeaponsDetector(InferenceModel):
     _model_type = ModelType.WEAPONS_DETECTION
@@ -83,7 +84,7 @@ class ThreatDetector:
         if model_path:
             self.initialize_model(model_path)
         else:
-            model_path = './train9_model_v1.pt'
+            model_path = './app/models/train9_model_v1.pt'
             self.initialize_model(model_path)
 
 
@@ -93,29 +94,71 @@ class ThreatDetector:
         return prediction_result 
     
 
-    def run_image_prediction_byte_stream(self, image):
-        if isinstance(image, bytes):
-            #detected_image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
-            image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
+    def run_image_prediction_byte_stream(self, image, asset_id, save_directory):
 
-            #detection_result,detection_image = threat_detector.run_prediction_bitstream (byte_image=image)
-            detection_result = self.run_prediction_image(image)[0]
-            detected_image = detection_result.plot()
+        file_path = save_directory / f"{asset_id}.jpg"
+
+        if file_path.exists():
+            weapon_detection_res = {
+                "filePath": str(file_path)
+            }
+            
         else:
-            detected_image = image
+            if isinstance(image, bytes):
+                image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
+                detection_result = self.run_prediction_image(image)[0]
+                detected_image = detection_result.plot()
+            else:
+                detected_image = image
 
-        # Encode image to base64 string
-        _, buffer = cv2.imencode('.jpg', detected_image)
-        encoded_string = base64.b64encode(buffer).decode('utf-8')
+            if asset_id:
+                cv2.imwrite(str(file_path), detected_image)
+            
+            weapon_detection_res = {
+                    "filePath": str(file_path)
+                }
+        
+        return weapon_detection_res
+    
+
+    def return_dummy_video(self):
+        with open('./app/models/test_video.mp4', 'rb') as video_file:
+            encoded_string = base64.b64encode(video_file.read()).decode('utf-8')
 
         outputs = []
         weapon_detection_res = {
-                "image": "data:image/jpeg;base64," + encoded_string,  # Prefix with data URI"
-                "score": 0.0
-            }
-        
+            "video": "data:video/mp4;base64," + encoded_string,  # Prefix with data URI
+            "score": 0.0
+        }
+
         outputs.append(weapon_detection_res)
+
         return outputs
+
+
+    def run_prediction_video(self, video_path, output_path, confidence=0.2):
+        video_cap = cv2.VideoCapture(str(video_path))
+        fps = video_cap.get(cv2.CAP_PROP_FPS)
+        frame_size = (int(video_cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+
+        fourcc = cv2.VideoWriter_fourcc(*'X264')
+        out = cv2.VideoWriter(output_path, fourcc, fps, frame_size)
+
+        ret = True 
+
+        while ret:
+            ret, frame = video_cap.read()
+
+            if ret:
+                results = self.model.track(frame, persist=True, conf=confidence)
+
+                frame_ = results[0].plot()
+
+                out.write(frame_)  # Write the frame into the file 'output.avi'
+
+        video_cap.release()
+        out.release()  # Release the VideoWriter
+
 
     def run_prediction_bitstream_deprecated(self, byte_image, save_path=None):
         reconstructed_image = Image.open(byte_image)

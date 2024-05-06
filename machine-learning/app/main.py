@@ -29,6 +29,7 @@ from .schemas import (
 import cv2
 import numpy as np
 import base64
+from pathlib import Path
 
 MultiPartParser.max_file_size = 2**26  # spools to disk if payload is 64 MiB or larger
 
@@ -41,8 +42,7 @@ last_called: float | None = None
 
 ### -- test code
 from .models.weapons_detector import ThreatDetector
-threat_detector = ThreatDetector('./app/models/train9_model_v1.pt')
-#threat_detector = None
+threat_detector = ThreatDetector()
 
 
 @asynccontextmanager
@@ -119,23 +119,13 @@ async def predict(
 
     if model_type == ModelType.WEAPONS_DETECTION:
         image = inputs
-        detection_response = threat_detector.run_image_prediction_byte_stream(image)
+        save_directory = Path("/ml-results/")
+        asset_id = kwargs.get("assetId", None)
+        detection_response = threat_detector.run_image_prediction_byte_stream(image, 
+                                                                              asset_id, 
+                                                                              save_directory)
 
-        filepath = "/ml-results/test.jpg"
-        assetId = kwargs.pop("assetId", "") #use for assetID
-        #Save image to folder /ml-results as a JPG file
-        with open(filepath, 'wb') as f:
-            f.write(image)
-        # video = inputs
-        # filepath = "/ml-results/videotest.mp4"
-        # with open(filepath, 'wb') as f:
-        #     f.write(video)
-        # Save video to folder /ml-results as a MP4 file
-
-        weapon: DetectedWeapons = {
-            "filePath": filepath,
-        }
-        return ORJSONResponse(weapon)
+        return ORJSONResponse(detection_response)
 
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
