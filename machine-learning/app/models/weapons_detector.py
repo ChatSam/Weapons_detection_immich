@@ -116,9 +116,11 @@ class ThreatDetector:
             if asset_id and detection_made:
                 cv2.imwrite(str(file_path), detected_image)
             
-            weapon_detection_res = {
-                    "filePath": str(file_path)
-                }
+                weapon_detection_res = {
+                        "filePath": str(file_path)
+                    }
+            else:
+                weapon_detection_res = {}
         
         return weapon_detection_res
 
