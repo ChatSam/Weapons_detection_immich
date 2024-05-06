@@ -14,7 +14,7 @@
 
 </script>
 
-<div class="flex gap-4 px-6 py-2">
+<div class="flex gap-4">
   <div class="h-full w-full shrink-0 bg-slate-300">
     {#if mediaMode === 'image'}
       <WeaponPhotoViewer filePath={weaponFilePath} />

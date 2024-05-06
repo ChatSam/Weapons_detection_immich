@@ -38,7 +38,7 @@
     bind:volume={$videoViewerVolume}
     poster={api.getAssetThumbnailUrl(assetId, ThumbnailFormat.Jpeg)}
   >
-    <source src={api.getPredictionUrl(filePath)} type="video/mp4" />
+    <source src={filePath} type="video/mp4" />
     <track kind="captions" />
   </video>
 

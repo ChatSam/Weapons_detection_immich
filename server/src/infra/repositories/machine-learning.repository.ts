@@ -15,7 +15,7 @@ import {
 } from '@app/domain';
 import { Injectable } from '@nestjs/common';
 import { readFile } from 'node:fs/promises';
-import { createReadStream } from 'node:fs'; 
+import { copyFileSync } from 'node:fs'; 
 
 const errorPrefix = 'Machine learning request';
 
@@ -84,7 +84,10 @@ export class MachineLearningRepository implements IMachineLearningRepository {
       formData.append('image', new Blob([await readFile(input.imagePath)]));
     } 
     else if ('videoPath' in input) {
-      formData.append('video', createReadStream(input.videoPath) as any);
+      const tempVideoPath = `/usr/src/app/ml-results/${input.videoPath.split('/').pop()}`;
+      copyFileSync(input.videoPath, tempVideoPath);
+      formData.append('videoFilePath', tempVideoPath);
+      
     }
     else if ('text' in input) {
       formData.append('text', input.text);

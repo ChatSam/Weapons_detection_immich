@@ -102,12 +102,12 @@ async def predict(
     options: str = Form(default="{}"),
     text: str | None = Form(default=None),
     image: UploadFile | None = None,
-    video: UploadFile | None = Form(default=None),
+    video: str | None = Form(alias="videoFilePath", default=None)
 ) -> Any:
     if image is not None:
         inputs: str | bytes = await image.read()
     elif video is not None:
-        inputs: str | bytes = "meh"
+        inputs = video
     elif text is not None:
         inputs = text
     else:
@@ -118,15 +118,28 @@ async def predict(
         raise HTTPException(400, f"Invalid options JSON: {options}")
 
     if model_type == ModelType.WEAPONS_DETECTION:
-        image = inputs
-        save_directory = Path("/ml-results/")
-        asset_id = kwargs.get("assetId", None)
-        detection_response = threat_detector.run_image_prediction_byte_stream(image, 
-                                                                              asset_id, 
-                                                                              save_directory)
+ 
 
-        return ORJSONResponse(detection_response)
+        mediaType = kwargs.get("mode", "")
+        if mediaType == "image":
+            image = inputs
+            save_directory = Path("/ml-results/")
+            asset_id = kwargs.get("assetId", None)
+            detection_response = threat_detector.run_image_prediction_byte_stream(image, 
+                                                                                asset_id, 
+                                                                                save_directory)
 
+            return ORJSONResponse(detection_response)
+        elif mediaType == "video":
+            videoFilePath = inputs
+            fileName = videoFilePath.split("/")[-1]
+            filepath = f"/ml-results/{fileName}"
+            #Save image to folder /ml-results as a JPG file
+            weapon: DetectedWeapons = {
+                "filePath": filepath,
+            }
+            return ORJSONResponse(weapon)
+    
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)
     outputs = await run(model.predict, inputs)
