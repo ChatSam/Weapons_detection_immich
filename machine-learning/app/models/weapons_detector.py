@@ -174,6 +174,9 @@ class ThreatDetector:
         if detection_made is False:
             os.remove(output_path)
 
+        # remove the copied resource in ml results volume
+        os.remove(video_path)
+
         return detection_made
 
 
