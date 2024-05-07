@@ -6,7 +6,7 @@ export LD_BIND_NOW=1
 : "${MACHINE_LEARNING_HOST:=0.0.0.0}"
 : "${MACHINE_LEARNING_PORT:=3003}"
 : "${MACHINE_LEARNING_WORKERS:=1}"
-: "${MACHINE_LEARNING_WORKER_TIMEOUT:=120}"
+: "${MACHINE_LEARNING_WORKER_TIMEOUT:=3600}"
 
 gunicorn app.main:app \
 	-k app.config.CustomUvicornWorker \
