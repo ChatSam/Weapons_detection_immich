@@ -130,18 +130,19 @@ class ThreatDetector:
     def run_prediction_video(self, video_path, save_directory, confidence=0.2):
         video_save_file_path = save_directory / f"detected_{video_path.name}"
         detection_made = False 
+        detected_file_path = ""
 
         if not video_save_file_path.exists():
             detection_made = self.predict_video(str(video_path), str(video_save_file_path), confidence)
 
-        if detection_made:
-            weapon_detection_res = {
-                "filePath": str(video_save_file_path)
-            }
+            if detection_made:
+                detected_file_path = str(video_save_file_path)
         else:
-             weapon_detection_res = {
-                "filePath": ""
-            }
+            detected_file_path = str(video_save_file_path)
+            
+        weapon_detection_res = {
+            "filePath": detected_file_path
+        }    
        
         return weapon_detection_res
         
@@ -175,7 +176,7 @@ class ThreatDetector:
             os.remove(output_path)
 
         # remove the copied resource in ml results volume
-        os.remove(video_path)
+        os.remove(str(video_path))
 
         return detection_made
 
