@@ -120,7 +120,9 @@ class ThreatDetector:
                         "filePath": str(file_path)
                     }
             else:
-                weapon_detection_res = {}
+                weapon_detection_res = {
+                        "filePath": ""
+                    }
         
         return weapon_detection_res
 

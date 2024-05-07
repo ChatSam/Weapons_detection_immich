@@ -55,10 +55,6 @@ export class MachineLearningRepository implements IMachineLearningRepository {
     } as CLIPConfig);
   }
 
-  // detectWeapons(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult[]> {
-  //   return this.predict<DetectWeaponsResult[]>(url, input, { ...config, modelType: ModelType.WEAPONS_DETECTION });
-  // }
-
   detectWeaponsInImage(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult> {
     return this.predict<DetectWeaponsResult>(url, input, { ...config, modelType: ModelType.WEAPONS_DETECTION, mode: MediaMode.IMAGE} as WeaponsDetectConfig);
   }

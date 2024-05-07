@@ -28,11 +28,6 @@ export interface DetectFaceResult {
   embedding: number[];
 }
 
-// export interface DetectWeaponsResult {
-//   image: string; // base64-encoded image
-//   score: number;
-// }
-
 export interface DetectWeaponsResult {
   filePath: string; //Path to the image
 }
@@ -58,7 +53,6 @@ export interface IMachineLearningRepository {
   encodeImage(url: string, input: VisionModelInput, config: CLIPConfig): Promise<number[]>;
   encodeText(url: string, input: TextModelInput, config: CLIPConfig): Promise<number[]>;
   detectFaces(url: string, input: VisionModelInput, config: RecognitionConfig): Promise<DetectFaceResult[]>;
-  // detectWeapons(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult[]>;
   detectWeaponsInImage(url: string, input: VisionModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult>;
   detectWeaponsInVideo(url: string, input: VideoModelInput, config: WeaponsDetectConfig): Promise<DetectWeaponsResult>;
 }

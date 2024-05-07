@@ -33,7 +33,13 @@
     <svelte:fragment slot="title">
       <span class="flex place-items-center gap-2">
         <p class="font-medium">
-          Weapon Detected!
+          {#if loading}
+            Detecting...
+          {:else if weaponFilePath !== ''}
+            Weapon Detected!
+          {:else}
+            No Weapon Detected!
+          {/if}
         </p>
       </span>
     </svelte:fragment>
@@ -63,8 +69,8 @@
             <!-- {/each} -->
               </div>
             </div>
-          {:else}
-            <p class="px-5 py-1 text-sm">No Weapons Detected!</p>
+          <!-- {:else}
+            <p class="px-5 py-1 text-sm">No Weapons Detected!</p> -->
           {/if}
         </div>
       {/if}
