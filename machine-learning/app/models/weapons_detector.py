@@ -129,13 +129,19 @@ class ThreatDetector:
 
     def run_prediction_video(self, video_path, save_directory, confidence=0.2):
         video_save_file_path = save_directory / f"detected_{video_path.name}"
+        detection_made = False 
 
         if not video_save_file_path.exists():
-            self.predict_video(str(video_path), str(video_save_file_path), confidence)
+            detection_made = self.predict_video(str(video_path), str(video_save_file_path), confidence)
 
-        weapon_detection_res = {
+        if detection_made:
+            weapon_detection_res = {
                 "filePath": str(video_save_file_path)
-        }
+            }
+        else:
+             weapon_detection_res = {
+                "filePath": ""
+            }
        
         return weapon_detection_res
         
@@ -167,6 +173,8 @@ class ThreatDetector:
         # if no weapons are detected, delete the processed video
         if detection_made is False:
             os.remove(output_path)
+
+        return detection_made
 
 
     def run_prediction_bitstream_deprecated(self, byte_image, save_path=None):
