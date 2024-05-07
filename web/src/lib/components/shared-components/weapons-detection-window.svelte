@@ -64,13 +64,15 @@
           {#if weaponFilePath !== ''}
             <div class="flex gap-4 px-6 py-2">
               <div class="h-full w-full shrink-0 bg-slate-300">
-            <!-- {#each weapons as weapon (weapon.image)} -->
                 <WeaponsListItem assetId={assetId} weaponFilePath={weaponFilePath} mediaMode={mediaMode} />
-            <!-- {/each} -->
               </div>
             </div>
-          <!-- {:else}
-            <p class="px-5 py-1 text-sm">No Weapons Detected!</p> -->
+          {:else}
+            <div class="flex gap-4 px-6 py-2">
+              <div class="h-300 w-300 shrink-0 bg-slate-300">
+                <WeaponsListItem assetId={assetId} weaponFilePath={'/ElmerFuddBg.png'} mediaMode={'image'} />
+              </div>
+            </div>
           {/if}
         </div>
       {/if}
