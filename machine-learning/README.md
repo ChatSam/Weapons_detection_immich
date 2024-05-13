@@ -28,10 +28,12 @@ Note that in Locust's jargon, concurrency is measured in `users`, and each user 
 
 The following steps give a high-level overview on setting up a new machine learning model in Immich.
 
-1. Define the new machine learning model in the **immich-machine-learning** container, i.e., the **machine-learning** folder. You will want to use the default **Inference Model** class provided when creating your own model interface and methods.
-2. In the backend server, **immich-server**, create corresponding Data Transfer Objects based on the data being returned by the new machine learning model. This will be in the **server** folder.
-3. Define correspoding machine learning request handling methods in the machine learning repository file present under **domain** and **infra**.
-4. Specify request methods in an existing microservice (such as **smart-info-service**), or create a new microservice which will be responsible for making these machine learning requests. These are usually defined under **server/src/domain/<microservice name>**.
-5. Define a controller which will act as the interface to the microservice request methods. This is where you define what the API request to the machine learning model would look like. This is under **server/src/immich/controllers**.
-6. After completing the above steps, start Immich on developer mode, and run `make open-api ` to generate new Open API specifications for the new Machine Learning API request.
-7. Use the newly defined OpenAPI specifications to build new frontend components to handle your API request to the machine learning server. This is done under **web**.
+1. Define the new machine learning model in the **immich-machine-learning** container, i.e., the **machine-learning** folder. Navigate to `machine-learning/models/` and create your new model there.
+
+2. When creating your own model interface and methods, makesure to inherit the  **Inference Model** class provided. 
+3. In the backend server, **immich-server**, create corresponding Data Transfer Objects based on the data being returned by the new machine learning model. This will be in the **server** folder.
+4. Define correspoding machine learning request handling methods in the machine learning repository file present under **domain** and **infra**.
+5. Specify request methods in an existing microservice (such as **smart-info-service**), or create a new microservice which will be responsible for making these machine learning requests. These are usually defined under **server/src/domain/<microservice name>**.
+6. Define a controller which will act as the interface to the microservice request methods. This is where you define what the API request to the machine learning model would look like. This is under **server/src/immich/controllers**.
+7. After completing the above steps, start Immich on developer mode, and run `make open-api ` to generate new Open API specifications for the new Machine Learning API request.
+8. Use the newly defined OpenAPI specifications to build new frontend components to handle your API request to the machine learning server. This is done under **web**.
