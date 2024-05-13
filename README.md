@@ -31,8 +31,9 @@
   <a href="README_ru_RU.md">Русский</a>
 </p>
 
-## Disclaimer
+### This repository builds on top of the original Immich project with the goal of developing a new feature - weapons detection in images and videos! ###
 
+## Disclaimer
 - ⚠️ The project is under **very active** development.
 - ⚠️ Expect bugs and breaking changes.
 - ⚠️ **Do not use the app as the only way to store your photos and videos.**
