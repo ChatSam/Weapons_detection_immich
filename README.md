@@ -1,5 +1,5 @@
 ## DISCLAIMER UPDATE (PROJECT APOLO)
-- This repository builds on top of the original Immich project with the goal of developing a new feature - weapons detection in images and videos!
+- This repository builds on top of the original Immich project with the goal of developing a new feature for the project - weapons detection in images and videos!
 - Check the [Machine Learning README.md](https://github.com/ChatSam/Weapons_detection_immich/blob/dev-primary/machine-learning/README.md) for high-level steps on creating your own machine learning feature in Immich!
 
 
