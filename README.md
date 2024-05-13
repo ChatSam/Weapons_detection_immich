@@ -1,3 +1,8 @@
+## DISCLAIMER UPDATE
+- This repository builds on top of the original Immich project with the goal of developing a new feature - weapons detection in images and videos!
+- Check the [Machine Learning README.md](https://github.com/ChatSam/Weapons_detection_immich/blob/dev-primary/machine-learning/README.md) for high-level steps on creating your own machine learning feature in Immich!
+
+
 <p align="center"> 
   <br/>  
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-green.svg?color=3F51B5&style=for-the-badge&label=License&logoColor=000000&labelColor=ececec" alt="License: MIT"></a>
@@ -30,8 +35,6 @@
   <a href="README_zh_CN.md">中文</a>
   <a href="README_ru_RU.md">Русский</a>
 </p>
-
-### This repository builds on top of the original Immich project with the goal of developing a new feature - weapons detection in images and videos! ###
 
 ## Disclaimer
 - ⚠️ The project is under **very active** development.
