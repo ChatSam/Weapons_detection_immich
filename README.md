@@ -1,5 +1,6 @@
-## DISCLAIMER UPDATE (PROJECT APOLO)
+## DISCLAIMER UPDATE (PROJECT APOLLO)
 - This repository builds on top of the original Immich project with the goal of developing a new feature for the project - weapons detection in images and videos!
+- Access the slides from the final presentation using this [link](https://docs.google.com/presentation/d/1vCU7UUd6YI2gG3d8a14MAuQseAqMhSY1TLidkRAqsDw/edit?usp=sharing). 
 - Check the [Machine Learning README.md](https://github.com/ChatSam/Weapons_detection_immich/blob/dev-primary/machine-learning/README.md) for high-level steps on creating your own machine learning feature in Immich!
 - Use the official Immich documentation for setup, but with our repository in place instead of the original project. No additional steps are required.
 
