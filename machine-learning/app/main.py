@@ -42,6 +42,7 @@ last_called: float | None = None
 
 ### -- test code
 from .models.weapons_detector import ThreatDetector
+from .models.weapons_detector import WeaponsDetector
 threat_detector = ThreatDetector()
 
 
@@ -118,31 +119,20 @@ async def predict(
         raise HTTPException(400, f"Invalid options JSON: {options}")
 
     if model_type == ModelType.WEAPONS_DETECTION:
-        mediaType = kwargs.get("mode", "")
-        detection_threshold = eval(options).get("minScore", 0.2)
+        model = WeaponsDetector(model_name, model_type, **kwargs)
+        model.load()
+        asset_id = kwargs.get("assetId", None)
+        model.configure(**kwargs)
+        outputs = model.predict(inputs, asset_id) 
+        return ORJSONResponse(outputs)
 
-        if mediaType == "image":
-            image = inputs
-            save_directory = Path("/ml-results/")
-            asset_id = kwargs.get("assetId", None)
-            detection_response = threat_detector.run_image_prediction_byte_stream(image, 
-                                                                                asset_id, 
-                                                                                save_directory,
-                                                                                detection_threshold)
-
-            return ORJSONResponse(detection_response)
-            
-        elif mediaType == "video":
-            video_file_path = Path(inputs)
-            save_directory = Path("/ml-results/")
-            video_file_path = save_directory / video_file_path.name
-
-            detection_response = threat_detector.run_prediction_video(video_file_path, 
-                                                                      save_directory,
-                                                                      detection_threshold)
-
-            return ORJSONResponse(detection_response)
         
+        """
+        #TODOs: 
+        Load models based on await (threaded)
+            1. Load model to cache
+            2. Load the model via async 
+        """
 
     model = await load(await model_cache.get(model_name, model_type, **kwargs))
     model.configure(**kwargs)

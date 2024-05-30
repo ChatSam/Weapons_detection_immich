@@ -21,6 +21,8 @@ from PIL import Image
 from ultralytics import YOLO
 from pathlib import Path
 import os
+from ..config import log
+from pathlib import Path
 
 class WeaponsDetector(InferenceModel):
     _model_type = ModelType.WEAPONS_DETECTION
@@ -33,81 +35,63 @@ class WeaponsDetector(InferenceModel):
         **model_kwargs: Any,
     ) -> None:
         self.mode = mode
+        self.default_thresh = 0.5
+        self.save_directory = Path('/ml-results/')
+        self.base_video_resource_dir = Path('/ml-results/')
+
         super().__init__(model_name, cache_dir, **model_kwargs)
 
-    def _load(self) -> None:
-        if self.mode == "image" or self.mode is None:
-            log.debug(f"Loading model '{self.model_name}'")
-            self.image_model = None
-            log.debug(f"Loaded model '{self.model_name}'")
+    def load(self) -> None:
+        if self.loaded:
+            return self.weapons_det_model  
+        self._load()
+        self.loaded = True
+        return self.weapons_det_model
 
-        if self.mode == "video" or self.mode is None:
-            log.debug(f"Loading model '{self.model_name}'")
-            self.video_model = None
-            log.debug(f"Loaded model '{self.model_name}'")
+    def _load(self, model_path='./app/models/train9_model_v1.pt') -> None:
+        log.info(f"Loading model '{self.model_name}'")
+        self.weapons_det_model = self.initialize_model(model_path)
+        log.info(f"Loaded model '{self.model_name}'")
 
-    def _predict(self, image: NDArray[np.uint8] | str) -> NDArray[np.float32]:
-        if isinstance(image, bytes):
-            decoded_image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
-        else:
-            decoded_image = image
+    def predict(self, inputs: Any, asset_id: str, **model_kwargs: Any) -> Any:
+        self.load()
+        if model_kwargs:
+            self.configure(**model_kwargs)
+        return self._predict(inputs, asset_id)
 
-        # Encode image to base64 string
-        _, buffer = cv2.imencode('.jpg', decoded_image)
-        encoded_string = base64.b64encode(buffer).decode('utf-8')
-
-        outputs = []
-        weapon: DetectedWeapons = {
-                "image": "data:image/jpeg;base64," + encoded_string,  # Prefix with data URI"
-                "score": 0.7
-            }
-        outputs.append(weapon)
-        # match image_or_text:
-        #     case Image.Image():
-        #         if self.mode == "text":
-        #             raise TypeError("Cannot encode image as text-only model")
-        #         outputs: NDArray[np.float32] = self.vision_model.run(None, self.transform(image_or_text))[0][0]
-        #     case str():
-        #         if self.mode == "vision":
-        #             raise TypeError("Cannot encode text as vision-only model")
-        #         outputs = self.text_model.run(None, self.tokenize(image_or_text))[0][0]
-        #     case _:
-        #         raise TypeError(f"Expected Image or str, but got: {type(image_or_text)}")
-
+    def _predict(self, inputs, asset_id) -> dict:
+        if self.mode == "image":
+            image = inputs
+            outputs = self.run_image_prediction_byte_stream(image,asset_id)
+            
+        elif self.mode == "video":
+            video_file_path = self.base_video_resource_dir / Path(inputs).name
+            outputs = self.run_prediction_video(video_file_path)
         return outputs
 
     def configure(self, **model_kwargs: Any) -> None:
-        self.det_model.det_thresh = model_kwargs.pop("minScore", self.det_model.det_thresh)
+        self.detection_threshold = model_kwargs.pop("minScore", self.default_thresh)
 
+    def initialize_model(self, model_path):
+        return YOLO(model_path)
 
-class ThreatDetector:
-    def __init__(self, model_path=None):
-        if model_path:
-            self.initialize_model(model_path)
-        else:
-            model_path = './app/models/train9_model_v1.pt'
-            self.initialize_model(model_path)
-
-
-    def run_prediction_image(self, image, confidence=0.15):
-        #model(source=1, show=True, conf=0.4, save=True)
-        prediction_result = self.model(image, conf=confidence)
+    def run_prediction_image(self, image):
+        prediction_result = self.weapons_det_model(image, conf=self.detection_threshold)
         return prediction_result 
     
+    def run_image_prediction_byte_stream(self, image, asset_id):
+        file_path = self.save_directory / f"{asset_id}.jpg"
 
-    def run_image_prediction_byte_stream(self, image, asset_id, save_directory, confidence):
-        file_path = save_directory / f"{asset_id}.jpg"
         detection_made = False
     
         if file_path.exists():
             weapon_detection_res = {
                 "filePath": str(file_path)
             }
-            
         else:
             if isinstance(image, bytes):
                 image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
-                detection_result = self.run_prediction_image(image, confidence)[0]
+                detection_result = self.run_prediction_image(image)[0]
                 detection_made = bool(len(detection_result))
                 detected_image = detection_result.plot()
             else:
@@ -126,14 +110,16 @@ class ThreatDetector:
         
         return weapon_detection_res
 
-
-    def run_prediction_video(self, video_path, save_directory, confidence=0.2):
-        video_save_file_path = save_directory / f"detected_{video_path.name}"
+    def run_prediction_video(self, video_path):
+        video_path = Path(video_path)
+        video_save_file_path = self.save_directory / f"detected_{video_path.name}"
         detection_made = False 
         detected_file_path = ""
 
+        video_save_file_path = Path(video_save_file_path)
+        print ("Path: " , video_save_file_path)
         if not video_save_file_path.exists():
-            detection_made = self.predict_video(str(video_path), str(video_save_file_path), confidence)
+            detection_made = self.predict_video(str(video_path), str(video_save_file_path))
 
             if detection_made:
                 detected_file_path = str(video_save_file_path)
@@ -143,11 +129,9 @@ class ThreatDetector:
         weapon_detection_res = {
             "filePath": detected_file_path
         }    
-       
         return weapon_detection_res
-        
-        
-    def predict_video(self, video_path, output_path, confidence):
+     
+    def predict_video(self, video_path, output_path):
         video_cap = cv2.VideoCapture(str(video_path))
         fps = video_cap.get(cv2.CAP_PROP_FPS)
         frame_size = (int(video_cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
@@ -159,9 +143,9 @@ class ThreatDetector:
         ret = True 
         while ret:
             ret, frame = video_cap.read()
-
+            
             if ret:
-                results = self.model.track(frame, persist=True, conf=confidence)
+                results = self.weapons_det_model.track(frame, persist=True, conf=self.detection_threshold)
                 frame_ = results[0].plot()
                 out.write(frame_)
 
@@ -180,27 +164,11 @@ class ThreatDetector:
 
         return detection_made
 
-
-    def run_prediction_bitstream_deprecated(self, byte_image, save_path=None):
-        reconstructed_image = Image.open(byte_image)
-        prediction_result = self.run_prediction_image(reconstructed_image)[0]
-
-        if save_path:
-            detection_image = self.create_detected_image(prediction_result, save_path)
-            print (f"Detection saved at {save_path}")
-
-        return prediction_result, detection_image
-
-
     def create_detected_image(self, detected_result, save_path):
         """ Saves the thumbnails of detection
         """
         return detected_result.plot(save=True, filename=save_path)
          
-
-    def initialize_model(self, model_path):
-        self.model = YOLO(model_path)
-
 
     # @abstractmethod
     # def tokenize(self, text: str) -> dict[str, NDArray[np.int32]]:
