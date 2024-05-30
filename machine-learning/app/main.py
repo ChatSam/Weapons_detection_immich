@@ -26,6 +26,8 @@ from .schemas import (
     DetectedWeapons,
 )
 
+from .models.weapons_detector import WeaponsDetector
+
 import cv2
 import numpy as np
 import base64
@@ -38,12 +40,6 @@ thread_pool: ThreadPoolExecutor | None = None
 lock = threading.Lock()
 active_requests = 0
 last_called: float | None = None
-
-
-### -- test code
-from .models.weapons_detector import ThreatDetector
-from .models.weapons_detector import WeaponsDetector
-threat_detector = ThreatDetector()
 
 
 @asynccontextmanager
